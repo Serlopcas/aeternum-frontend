@@ -1,0 +1,51 @@
+<app-page-header title="Alertas de stock" subtitle="Variantes por debajo del stock mínimo" />
+
+<div class="filters-bar">
+  <label class="checkbox-label">
+    <input type="checkbox" [(ngModel)]="onlySellable" (ngModelChange)="load()" />
+    Solo vendibles
+  </label>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (!page()?.content?.length) {
+  <app-empty-state message="No hay alertas de stock. ¡Todo en orden!" />
+} @else {
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Stock actual</th>
+          <th>Stock mínimo</th>
+          <th>Déficit</th>
+          <th>Vendible</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of page()!.content; track a.variantId) {
+          <tr>
+            <td class="font-mono">{{ a.sku }}</td>
+            <td>{{ a.productName }}</td>
+            <td>{{ a.categoryName }}</td>
+            <td class="stock-current">{{ a.currentStock }}</td>
+            <td>{{ a.minimumStock }}</td>
+            <td class="stock-diff">{{ a.minimumStock - a.currentStock }}</td>
+            <td>{{ a.isSellable ? 'Sí' : 'No' }}</td>
+            <td><a [routerLink]="['/products', a.productId]" class="link">Ver producto</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <app-pagination
+    [currentPage]="page()!.number"
+    [totalPages]="page()!.totalPages"
+    [totalElements]="page()!.totalElements"
+    (pageChange)="pageNum = $event; load()"
+  />
+}

@@ -1,0 +1,257 @@
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e5e7eb;
+}
+.tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  position: relative;
+}
+.tab.active {
+  color: #75482a;
+}
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #75482a;
+}
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.info-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.notes-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+.notes-section p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #374151;
+}
+.tab-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  text-align: left;
+  padding: 10px 12px;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+  background: #fafaf8;
+}
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.action-btns {
+  display: flex;
+  gap: 4px;
+}
+.action-btn {
+  padding: 4px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  color: #374151;
+}
+.action-btn:hover {
+  background: #f3f4f6;
+}
+.action-btn--danger {
+  color: #c53030;
+  border-color: #fed7d7;
+}
+.action-btn--danger:hover {
+  background: #fff5f5;
+}
+.empty-msg {
+  text-align: center;
+  color: #6b7280;
+  padding: 32px 0;
+  font-size: 14px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+.form-input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+.form-input:focus {
+  border-color: #75482a;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+.btn--primary {
+  background: #75482a;
+  color: #fff;
+}
+.btn--primary:hover {
+  background: #5e3a22;
+}
+.btn--secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+.btn--sm {
+  padding: 6px 16px;
+  font-size: 13px;
+}
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.dialog {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+.dialog h3 {
+  margin: 0 0 20px;
+  font-size: 20px;
+  color: #1f2933;
+}
+.dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+// Catalog tab
+.catalog-category {
+  &:not(:first-child) {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+  }
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2933;
+    margin: 0 0 12px;
+  }
+}
+.catalog-product {
+  margin-left: 8px;
+  margin-bottom: 16px;
+  &__title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin: 0 0 8px;
+  }
+  &__code {
+    font-family: monospace;
+    font-size: 12px;
+    color: #6b7280;
+    margin-right: 8px;
+  }
+}
+.font-mono {
+  font-family: monospace;
+  font-size: 13px;
+}
+.row--inactive {
+  opacity: 0.6;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge--preferred {
+  background: #fef3c7;
+  color: #92400e;
+}
+.badge--inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}

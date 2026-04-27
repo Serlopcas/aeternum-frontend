@@ -1,0 +1,227 @@
+<app-page-header title="Usuarios" subtitle="Gestión de usuarios del sistema">
+  <button
+    class="btn btn--primary"
+    (click)="showCreateDialog.set(true)"
+    aria-label="Crear nuevo usuario"
+  >
+    + Nuevo usuario
+  </button>
+</app-page-header>
+
+<div class="filters-bar">
+  <app-active-filter [value]="activeFilter()" (valueChange)="onActiveChange($event)" />
+  <select
+    class="filter-select"
+    [ngModel]="roleFilter()"
+    (ngModelChange)="onRoleChange($event)"
+    aria-label="Filtrar por rol"
+  >
+    <option value="">Todos los roles</option>
+    @for (r of roles(); track r.code) {
+      <option [value]="r.code">{{ r.name }}</option>
+    }
+  </select>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (users().length === 0) {
+  <app-empty-state
+    icon="👥"
+    title="No hay usuarios"
+    message="No se encontraron usuarios con los filtros actuales."
+  />
+} @else {
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Nombre</th>
+          <th>Roles</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users(); track user.id) {
+          <tr [class.row--inactive]="!user.active">
+            <td class="font-mono">{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <td>
+              @for (r of user.roles; track r) {
+                <span class="role-chip">{{ r }}</span>
+              }
+            </td>
+            <td>
+              <app-status-badge
+                [label]="user.active ? 'Activo' : 'Inactivo'"
+                [colorClass]="getActiveColor(user.active)"
+              />
+            </td>
+            <td>
+              <div class="action-btns">
+                <a
+                  [routerLink]="['/users', user.id]"
+                  class="action-btn"
+                  [attr.aria-label]="'Ver detalle de ' + user.username"
+                  >Ver</a
+                >
+                @if (user.id !== auth.user()?.id) {
+                  <button
+                    class="action-btn"
+                    (click)="toggleUserStatus(user)"
+                    [attr.aria-label]="
+                      (user.active ? 'Desactivar' : 'Activar') + ' ' + user.username
+                    "
+                  >
+                    {{ user.active ? 'Desactivar' : 'Activar' }}
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <app-pagination
+      [currentPage]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="onPageChange($event)"
+    />
+  </div>
+}
+
+@if (showCreateDialog()) {
+  <div class="dialog-backdrop" (click)="showCreateDialog.set(false)">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <h3>Nuevo usuario</h3>
+      <form
+        class="form"
+        #createUserForm="ngForm"
+        (ngSubmit)="createUserForm.form.markAllAsTouched(); createUserForm.valid && createUser()"
+      >
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Usuario *</label>
+            <input
+              class="form-input"
+              [(ngModel)]="newUser.username"
+              name="username"
+              #usrNameRef="ngModel"
+              required
+              minlength="3"
+              maxlength="50"
+              pattern="^[a-zA-Z0-9_.\-]+$"
+            />
+            @if (usrNameRef.invalid && usrNameRef.touched) {
+              @if (usrNameRef.errors?.['required']) {
+                <small class="form-error">El usuario es obligatorio</small>
+              } @else if (usrNameRef.errors?.['minlength']) {
+                <small class="form-error">Mínimo 3 caracteres</small>
+              } @else if (usrNameRef.errors?.['pattern']) {
+                <small class="form-error"
+                  >Solo letras, números, puntos, guiones y guiones bajos</small
+                >
+              }
+            }
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input
+              class="form-input"
+              type="email"
+              [(ngModel)]="newUser.email"
+              name="email"
+              #usrEmailRef="ngModel"
+              required
+              maxlength="150"
+            />
+            @if (usrEmailRef.invalid && usrEmailRef.touched) {
+              <small class="form-error">El email es obligatorio</small>
+            }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nombre *</label>
+            <input
+              class="form-input"
+              [(ngModel)]="newUser.firstName"
+              name="firstName"
+              #usrFirstRef="ngModel"
+              required
+              maxlength="100"
+            />
+            @if (usrFirstRef.invalid && usrFirstRef.touched) {
+              <small class="form-error">El nombre es obligatorio</small>
+            }
+          </div>
+          <div class="form-group">
+            <label class="form-label">Apellidos *</label>
+            <input
+              class="form-input"
+              [(ngModel)]="newUser.lastName"
+              name="lastName"
+              #usrLastRef="ngModel"
+              required
+              maxlength="150"
+            />
+            @if (usrLastRef.invalid && usrLastRef.touched) {
+              <small class="form-error">Los apellidos son obligatorios</small>
+            }
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña *</label>
+          <input
+            class="form-input"
+            type="password"
+            [(ngModel)]="newUser.password"
+            name="password"
+            #usrPwRef="ngModel"
+            required
+            minlength="8"
+            maxlength="72"
+            autocomplete="new-password"
+          />
+          @if (usrPwRef.invalid && usrPwRef.touched) {
+            @if (usrPwRef.errors?.['required']) {
+              <small class="form-error">La contraseña es obligatoria</small>
+            } @else if (usrPwRef.errors?.['minlength']) {
+              <small class="form-error">Mínimo 8 caracteres</small>
+            }
+          } @else {
+            <small class="form-hint">Mínimo 8 caracteres, mayúscula, minúscula y dígito</small>
+          }
+        </div>
+        <div class="dialog__actions">
+          <button class="btn btn--secondary" type="button" (click)="showCreateDialog.set(false)">
+            Cancelar
+          </button>
+          <button class="btn btn--primary" type="submit">Crear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<app-confirm-dialog
+  [open]="confirmToggle() !== null"
+  [title]="confirmToggle()?.active ? 'Desactivar usuario' : 'Activar usuario'"
+  [message]="
+    '¿Seguro que quieres ' +
+    (confirmToggle()?.active ? 'desactivar' : 'activar') +
+    ' a ' +
+    (confirmToggle()?.username ?? '') +
+    '?'
+  "
+  [destructive]="confirmToggle()?.active === true"
+  [confirmLabel]="confirmToggle()?.active ? 'Desactivar' : 'Activar'"
+  (confirm)="confirmStatusChange()"
+  (cancel)="confirmToggle.set(null)"
+/>

@@ -1,0 +1,244 @@
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+}
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #fafaf8;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+}
+.table th.col-actions {
+  text-align: center;
+}
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1f2933;
+}
+.table tr:hover {
+  background: #fafaf8;
+}
+/* Scope view toggle styles to the filters bar only */
+.filters-bar .view-toggle {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.filters-bar .view-btn {
+  padding: 8px 16px;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+.filters-bar .view-btn.active {
+  background: #75482a;
+  color: #fff;
+}
+.row--inactive {
+  opacity: 0.6;
+}
+.name-cell {
+  font-weight: 500;
+}
+.font-mono {
+  font-family: monospace;
+  font-size: 13px;
+}
+.action-btns {
+  display: flex;
+  gap: 8px;
+}
+.action-btn {
+  padding: 4px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  color: #374151;
+  text-decoration: none;
+}
+.action-btn:hover {
+  background: #f3f4f6;
+}
+.btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn--primary {
+  background: #75482a;
+  color: #fff;
+}
+.btn--primary:hover {
+  background: #5e3a22;
+}
+
+// ─── View toggle ───
+// (styles for view-toggle/view-btn are defined above to match categories page)
+
+// ─── Filter checkbox ───
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+// ─── Page size ───
+.filters-bar .page-size {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.filters-bar .page-size .form-label {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+.filters-bar .page-size .form-input {
+  width: 88px;
+  padding: 6px 8px;
+}
+/* Match categories .form-input appearance for the select */
+.filters-bar .page-size .form-input {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  outline: none;
+}
+.filters-bar .page-size .form-input:focus {
+  border-color: #75482a;
+}
+
+// ─── Category separator row ───
+.category-separator td {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #75482a;
+  background: #fdf6f0;
+  padding: 6px 16px;
+  border-top: 2px solid #e5c49a;
+}
+
+// ─── Cards view ───
+.products-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.category-group-header {
+  grid-column: 1 / -1;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #75482a;
+  padding: 8px 4px 4px;
+  border-bottom: 2px solid #e5c49a;
+  margin-top: 8px;
+}
+
+.product-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s,
+    transform 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &--inactive {
+    opacity: 0.6;
+  }
+
+  &__code {
+    font-family: monospace;
+    font-size: 11px;
+    color: #9ca3af;
+  }
+
+  &__name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #1f2933;
+    line-height: 1.3;
+  }
+
+  &__category {
+    font-size: 12px;
+    color: #75482a;
+  }
+
+  &__brand {
+    font-size: 12px;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f3f4f6;
+  }
+}

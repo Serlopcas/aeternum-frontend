@@ -1,0 +1,193 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (order()) {
+  <app-page-header [title]="'Pedido ' + order()!.purchaseNumber" [subtitle]="order()!.supplierName">
+    <a routerLink="/purchases" class="btn btn--secondary">← Volver</a>
+  </app-page-header>
+
+  <div class="detail-grid">
+    <div class="card status-card">
+      <div class="status-header">
+        <app-status-badge
+          [label]="order()!.statusName"
+          [colorClass]="getStatusColor(order()!.statusCode)"
+        />
+      </div>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">Fecha documento</span
+          ><span>{{ order()!.documentDate | appDate }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Entrega esperada</span
+          ><span>{{
+            order()!.expectedDeliveryDate ? (order()!.expectedDeliveryDate | appDate) : '—'
+          }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Fecha recepción</span
+          ><span>{{ order()!.receivedDate ? (order()!.receivedDate | appDate) : '—' }}</span>
+        </div>
+      </div>
+
+      @if (auth.isGestor() || auth.isTrabajador()) {
+        <div class="status-actions">
+          <h5>Cambiar estado</h5>
+          <div class="form-group" style="margin-bottom: 8px">
+            <input
+              class="form-input"
+              placeholder="Comentario del cambio (opcional)"
+              [(ngModel)]="statusComment"
+              aria-label="Comentario para el cambio de estado"
+            />
+          </div>
+          <div class="status-row">
+            <select
+              class="form-input"
+              [(ngModel)]="newStatus"
+              aria-label="Seleccionar nuevo estado de compra"
+            >
+              @for (s of availableStatuses(); track s.statusCode) {
+                <option [value]="s.statusCode">{{ s.statusName }}</option>
+              }
+            </select>
+            <button
+              class="btn btn--primary btn--sm"
+              (click)="changeStatus()"
+              [disabled]="newStatus === order()!.statusCode && !statusComment"
+              aria-label="Guardar cambio de estado o nota del pedido de compra"
+            >
+              {{ newStatus !== order()!.statusCode ? 'Cambiar' : 'Guardar nota' }}
+            </button>
+          </div>
+        </div>
+
+        @if (order()!.statusCode === 'APPROVED' || order()!.statusCode === 'PARTIALLY_RECEIVED') {
+          <div class="receive-section">
+            <h5>Recepcionar</h5>
+            @for (line of order()!.lines; track line.id) {
+              <div class="receive-line">
+                <span class="font-mono">{{ line.sku }}</span>
+                <span class="receive-desc">{{ line.descriptionSnapshot }}</span>
+                <span>{{ line.quantityReceived }}/{{ line.quantityOrdered }}</span>
+                <input
+                  class="inline-input"
+                  type="number"
+                  min="0"
+                  [max]="line.quantityOrdered - line.quantityReceived"
+                  [(ngModel)]="receiveQuantities[line.id]"
+                  [placeholder]="'0'"
+                />
+              </div>
+            }
+            <div class="form-group" style="margin-top: 8px">
+              <input
+                class="form-input"
+                placeholder="Comentario recepción"
+                [(ngModel)]="receiveComment"
+              />
+            </div>
+            <button
+              class="btn btn--primary btn--sm"
+              (click)="receiveOrder()"
+              aria-label="Recepcionar pedido"
+            >
+              Recepcionar
+            </button>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="card lines-card">
+      <h4>Líneas del pedido</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>SKU</th>
+            <th>Descripción</th>
+            <th>Cant.</th>
+            <th>Recibido</th>
+            <th>Coste unit.</th>
+            <th>Dto %</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of order()!.lines; track line.id) {
+            <tr>
+              <td>{{ line.lineNumber }}</td>
+              <td class="font-mono">{{ line.sku }}</td>
+              <td>{{ line.descriptionSnapshot }}</td>
+              <td>{{ line.quantityOrdered }}</td>
+              <td>{{ line.quantityReceived }}</td>
+              <td>{{ line.unitCostSnapshot | appCurrency }}</td>
+              <td>{{ line.discountPercent }}%</td>
+              <td class="font-bold">{{ line.lineTotal | appCurrency }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6"></td>
+            <td class="total-label">Subtotal</td>
+            <td>{{ order()!.subtotalAmount | appCurrency }}</td>
+          </tr>
+          <tr>
+            <td colspan="6"></td>
+            <td class="total-label">Descuento</td>
+            <td>-{{ order()!.discountAmount | appCurrency }}</td>
+          </tr>
+          <tr>
+            <td colspan="6"></td>
+            <td class="total-label font-bold">Total</td>
+            <td class="total-value">{{ order()!.totalAmount | appCurrency }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      @if (order()!.internalNotes) {
+        <div class="notes"><strong>Notas internas:</strong> {{ order()!.internalNotes }}</div>
+      }
+      @if (order()!.supplierNotes) {
+        <div class="notes"><strong>Notas proveedor:</strong> {{ order()!.supplierNotes }}</div>
+      }
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 20px">
+    <h4>Historial de estados</h4>
+    @if (!order()!.statusHistory.length) {
+      <p class="empty-msg">Sin historial.</p>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>De</th>
+            <th>A</th>
+            <th>Usuario</th>
+            <th>Comentario</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (h of order()!.statusHistory; track h.id) {
+            <tr>
+              <td>{{ h.changedAt | appDateTime }}</td>
+              <td>{{ h.fromStatusName ?? '—' }}</td>
+              <td>
+                <app-status-badge
+                  [label]="h.toStatusName"
+                  [colorClass]="getStatusColor(h.toStatusCode)"
+                />
+              </td>
+              <td>{{ h.changedByUsername }}</td>
+              <td>{{ h.comment ?? '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+}

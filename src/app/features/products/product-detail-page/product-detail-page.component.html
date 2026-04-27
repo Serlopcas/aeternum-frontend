@@ -1,0 +1,696 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (product()) {
+  <app-page-header [title]="product()!.name" [subtitle]="product()!.productCode">
+    <a routerLink="/products" class="btn btn--secondary">← Volver</a>
+  </app-page-header>
+
+  <div class="tabs">
+    <button
+      class="tab"
+      [class.active]="tab() === 'info'"
+      (click)="trySetTab('info')"
+      aria-label="Pestaña información"
+    >
+      Información
+    </button>
+    <button
+      class="tab"
+      [class.active]="tab() === 'images'"
+      [class.tab--locked]="isNew"
+      (click)="trySetTab('images')"
+      [attr.aria-label]="isNew ? 'Imágenes (guarda el producto primero)' : 'Pestaña imágenes'"
+    >
+      Imágenes ({{ product()!.images?.length ?? 0 }})
+      @if (isNew) {
+        <span class="tab-lock">🔒</span>
+      }
+    </button>
+    <button
+      class="tab"
+      [class.active]="tab() === 'variants'"
+      [class.tab--locked]="isNew"
+      (click)="trySetTab('variants')"
+      [attr.aria-label]="isNew ? 'Variantes (guarda el producto primero)' : 'Pestaña variantes'"
+    >
+      Variantes ({{ product()!.variants?.length ?? 0 }})
+      @if (isNew) {
+        <span class="tab-lock">🔒</span>
+      }
+    </button>
+  </div>
+
+  @if (tab() === 'info') {
+    <div class="card">
+      @if (editMode()) {
+        <form
+          class="form"
+          #productForm="ngForm"
+          (ngSubmit)="productForm.form.markAllAsTouched(); productForm.valid && saveProduct()"
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Categoría *</label>
+              <select
+                class="form-input"
+                [ngModel]="form.categoryId"
+                (ngModelChange)="onCategoryChange($event)"
+                name="categoryId"
+                #catIdRef="ngModel"
+                required
+              >
+                <option [ngValue]="null" disabled>Selecciona una categoría</option>
+                @for (c of flatCategories(); track c.id) {
+                  <option [ngValue]="c.id">{{ c.label }}</option>
+                }
+              </select>
+              @if (catIdRef.invalid && catIdRef.touched) {
+                <small class="form-error">La categoría es obligatoria</small>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Código *
+                @if (isNew && suggestedCode()) {
+                  <span class="code-hint"> — Sugerido: {{ suggestedCode() }}</span>
+                }
+              </label>
+              <input
+                class="form-input"
+                [ngModel]="form.productCode"
+                (ngModelChange)="form.productCode = $event"
+                (input)="onProductCodeInput()"
+                name="productCode"
+                #prodCodeRef="ngModel"
+                required
+                maxlength="30"
+                [disabled]="isNew && !form.categoryId"
+              />
+              @if (prodCodeRef.invalid && prodCodeRef.touched) {
+                <small class="form-error">El código es obligatorio</small>
+              }
+              @if (isNew && suggestedCode() && codeEdited()) {
+                <div class="small-muted">
+                  Sugerido: <span class="suggest-kbd">{{ suggestedCode() }}</span>
+                  <button
+                    type="button"
+                    class="apply-btn"
+                    (click)="applySuggestedCode()"
+                    aria-label="Aplicar código sugerido"
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nombre *</label>
+            <input
+              class="form-input"
+              [(ngModel)]="form.name"
+              name="name"
+              #prodNameRef="ngModel"
+              required
+              maxlength="150"
+            />
+            @if (prodNameRef.invalid && prodNameRef.touched) {
+              <small class="form-error">El nombre es obligatorio</small>
+            }
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Marca</label>
+              <input
+                class="form-input"
+                [(ngModel)]="form.brandName"
+                name="brandName"
+                maxlength="100"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Colección</label>
+              <input
+                class="form-input"
+                [(ngModel)]="form.collectionName"
+                name="collectionName"
+                maxlength="100"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Material por defecto</label>
+              <input
+                class="form-input"
+                [(ngModel)]="form.defaultMaterial"
+                name="defaultMaterial"
+                maxlength="50"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acabado por defecto</label>
+              <input
+                class="form-input"
+                [(ngModel)]="form.defaultFinish"
+                name="defaultFinish"
+                maxlength="50"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descripción corta</label>
+            <input
+              class="form-input"
+              [(ngModel)]="form.shortDescription"
+              name="shortDescription"
+              maxlength="255"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descripción</label>
+            <textarea
+              class="form-input"
+              [(ngModel)]="form.description"
+              name="description"
+              rows="3"
+              maxlength="2000"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notas internas</label>
+            <textarea
+              class="form-input"
+              [(ngModel)]="form.internalNotes"
+              name="internalNotes"
+              rows="2"
+              maxlength="2000"
+            ></textarea>
+          </div>
+          <div class="form-actions">
+            @if (!isNew) {
+              <button class="btn btn--secondary" type="button" (click)="editMode.set(false)">
+                Cancelar
+              </button>
+            }
+            <button class="btn btn--primary" type="submit">
+              {{ isNew ? 'Crear producto' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      } @else {
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Código</span
+            ><span class="font-mono">{{ product()!.productCode }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Categoría</span><span>{{ product()!.categoryName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Marca</span><span>{{ product()!.brandName ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Colección</span
+            ><span>{{ product()!.collectionName ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Material</span
+            ><span>{{ product()!.defaultMaterial ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Acabado</span
+            ><span>{{ product()!.defaultFinish ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Estado</span>
+            <app-status-badge
+              [label]="product()!.active ? 'Activo' : 'Inactivo'"
+              [colorClass]="getColor(product()!.active)"
+            />
+          </div>
+        </div>
+        @if (product()!.shortDescription || product()!.description) {
+          <div class="desc-section">
+            @if (product()!.shortDescription) {
+              <p class="short-desc">{{ product()!.shortDescription }}</p>
+            }
+            @if (product()!.description) {
+              <p class="full-desc">{{ product()!.description }}</p>
+            }
+          </div>
+        }
+        @if (auth.isGestor()) {
+          <div class="form-actions">
+            <button class="btn btn--secondary" (click)="startEdit()" aria-label="Editar producto">
+              Editar
+            </button>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (tab() === 'images') {
+    <div class="card">
+      @if (auth.isGestor()) {
+        <div class="tab-header">
+          <button
+            class="btn btn--primary btn--sm"
+            (click)="openImageDialog()"
+            aria-label="Añadir nueva imagen"
+          >
+            + Añadir imagen
+          </button>
+        </div>
+      }
+      @if (!product()!.images?.length) {
+        <p class="empty-msg">No hay imágenes registradas.</p>
+      } @else {
+        <div class="images-grid">
+          @for (img of product()!.images; track img.id) {
+            <div class="image-card" [class.primary]="img.isPrimary" [class.inactive]="!img.active">
+              <img
+                [src]="img.publicUrl"
+                [alt]="img.altText ?? 'Product image'"
+                class="image-thumb"
+                (error)="onImageError($event)"
+              />
+              <div class="image-info">
+                @if (img.isPrimary) {
+                  <span class="primary-badge">Principal</span>
+                }
+                <span class="image-order">Orden: {{ img.displayOrder }}</span>
+              </div>
+              @if (auth.isGestor()) {
+                <div class="image-actions">
+                  <button class="action-btn" (click)="editImage(img)" aria-label="Editar imagen">
+                    Editar
+                  </button>
+                  <button
+                    class="action-btn action-btn--danger"
+                    (click)="askDeleteImage(img)"
+                    aria-label="Eliminar imagen"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <app-confirm-dialog
+    [open]="confirmDeleteImage() !== null"
+    title="Eliminar imagen"
+    message="¿Eliminar esta imagen? Se borrará permanentemente del servidor."
+    [destructive]="true"
+    confirmLabel="Eliminar"
+    (confirm)="doDeleteImage()"
+    (cancel)="confirmDeleteImage.set(null)"
+  />
+
+  @if (tab() === 'variants') {
+    <div class="card">
+      @if (auth.isGestor()) {
+        <div class="tab-header">
+          <button
+            class="btn btn--primary btn--sm"
+            (click)="openVariantDialog()"
+            aria-label="Crear nueva variante"
+          >
+            + Nueva variante
+          </button>
+        </div>
+      }
+      @if (!product()!.variants?.length) {
+        <p class="empty-msg">No hay variantes registradas.</p>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>SKU</th>
+              <th>Material</th>
+              <th>Color</th>
+              <th>{{ primaryMeasureLabel() }}</th>
+              <th>Peso (g)</th>
+              <th>Precio</th>
+              <th>Stock min.</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (v of product()!.variants; track v.id) {
+              <tr [class.row--inactive]="!v.active">
+                <td>{{ variantName(v) }}</td>
+                <td class="font-mono">{{ v.sku }}</td>
+                <td>{{ v.material ?? '—' }}</td>
+                <td>{{ v.color ?? '—' }}</td>
+                <td>{{ v.primaryMeasureValue ?? '—' }}</td>
+                <td>{{ v.weightGrams ?? '—' }}</td>
+                <td>{{ v.baseSalePrice | appCurrency }}</td>
+                <td>{{ v.minimumStock }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="v.active ? 'Activo' : 'Inactivo'"
+                    [colorClass]="getColor(v.active)"
+                  />
+                </td>
+                <td>
+                  <div class="action-btns">
+                    <a
+                      [routerLink]="['/products', product()!.id, 'variants', v.id]"
+                      class="action-btn"
+                      [attr.aria-label]="'Ver variante ' + v.sku"
+                      >Ver</a
+                    >
+                    @if (auth.isGestor()) {
+                      <button
+                        class="action-btn"
+                        (click)="toggleVariant(v)"
+                        [attr.aria-label]="
+                          (v.active ? 'Desactivar' : 'Activar') + ' variante ' + v.sku
+                        "
+                      >
+                        {{ v.active ? 'Desact.' : 'Act.' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  @if (variantDialogOpen()) {
+    <div class="dialog-backdrop" (click)="variantDialogOpen.set(false)">
+      <div
+        class="dialog dialog--wide"
+        role="dialog"
+        aria-label="Nueva variante"
+        (click)="$event.stopPropagation()"
+      >
+        <h3>Nueva variante</h3>
+        <form
+          class="form"
+          #variantCreateForm="ngForm"
+          (ngSubmit)="
+            variantCreateForm.form.markAllAsTouched(); variantCreateForm.valid && saveVariant()
+          "
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">SKU *</label>
+              <input
+                class="form-input"
+                [(ngModel)]="variantForm.sku"
+                name="sku"
+                #varSkuRef="ngModel"
+                required
+                maxlength="60"
+              />
+              @if (varSkuRef.invalid && varSkuRef.touched) {
+                <small class="form-error">El SKU es obligatorio</small>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">Material *</label>
+              <input
+                class="form-input"
+                [(ngModel)]="variantForm.material"
+                name="material"
+                #varMatRef="ngModel"
+                required
+                maxlength="50"
+                [placeholder]="defaultMaterialPlaceholder"
+              />
+              @if (varMatRef.invalid && varMatRef.touched) {
+                <small class="form-error">El material es obligatorio</small>
+              }
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <div class="color-dropdown-wrapper">
+                <button
+                  type="button"
+                  class="form-input color-dropdown-trigger"
+                  (click)="toggleColorDropdown()"
+                >
+                  @if (variantForm.color) {
+                    <span
+                      class="color-swatch-sm"
+                      [style.background-color]="getColorHex(variantForm.color)"
+                    ></span>
+                    {{ variantForm.color }}
+                  } @else {
+                    <span class="placeholder-text">Selecciona un color</span>
+                  }
+                </button>
+                @if (colorDropdownOpen()) {
+                  <div class="color-dropdown-list">
+                    @for (c of colors(); track c.id) {
+                      <button type="button" class="color-dropdown-item" (click)="selectColor(c)">
+                        <span class="color-swatch-sm" [style.background-color]="c.colorCode"></span>
+                        {{ c.colorName }}
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="color-dropdown-item color-dropdown-item--add"
+                      (click)="openNewColorDialog()"
+                    >
+                      + Añadir color
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acabado</label>
+              <input
+                class="form-input"
+                [(ngModel)]="variantForm.finish"
+                name="finish"
+                maxlength="50"
+                [placeholder]="defaultFinishPlaceholder"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Pureza</label>
+              <input
+                class="form-input"
+                [(ngModel)]="variantForm.purity"
+                name="purity"
+                maxlength="50"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Peso (g)</label>
+              <input
+                class="form-input"
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="variantForm.weightGrams"
+                name="weightGrams"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Precio venta base</label>
+              <input
+                class="form-input"
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="variantForm.baseSalePrice"
+                name="baseSalePrice"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock mínimo *</label>
+              <input
+                class="form-input"
+                type="number"
+                min="0"
+                [(ngModel)]="variantForm.minimumStock"
+                name="minimumStock"
+                #varStockRef="ngModel"
+                required
+              />
+              @if (varStockRef.invalid && varStockRef.touched) {
+                <small class="form-error">El stock mínimo es obligatorio</small>
+              }
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ primaryMeasureLabel() }}</label>
+              <input
+                class="form-input"
+                [(ngModel)]="variantForm.primaryMeasureValue"
+                name="pmv"
+                maxlength="50"
+              />
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="variantForm.isSellable" name="isSellable" />
+            Vendible
+          </label>
+          <div class="dialog__actions">
+            <button class="btn btn--secondary" type="button" (click)="variantDialogOpen.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">Crear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (imageDialogOpen()) {
+    <div class="dialog-backdrop" (click)="imageDialogOpen.set(false)">
+      <div
+        class="dialog"
+        role="dialog"
+        [attr.aria-label]="editImageId() ? 'Editar imagen' : 'Añadir imagen'"
+        (click)="$event.stopPropagation()"
+      >
+        <h3>{{ editImageId() ? 'Editar imagen' : 'Añadir imagen' }}</h3>
+        <form
+          class="form"
+          #imageForm2="ngForm"
+          (ngSubmit)="imageForm2.form.markAllAsTouched(); imageForm2.valid && saveImage()"
+        >
+          @if (!editImageId()) {
+            <div class="form-group">
+              <label class="form-label">Archivo de imagen *</label>
+              <input
+                class="form-input"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                (change)="onFileSelected($event)"
+                name="file"
+              />
+            </div>
+          }
+          @if (imagePreview()) {
+            <div class="form-group">
+              <img
+                [src]="imagePreview()"
+                alt="Vista previa"
+                class="image-thumb"
+                style="max-width: 200px; max-height: 150px; border-radius: 8px"
+              />
+            </div>
+          }
+          <div class="form-group">
+            <label class="form-label">Texto alternativo</label>
+            <input
+              class="form-input"
+              [(ngModel)]="imageForm.altText"
+              name="altText"
+              maxlength="255"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Orden</label>
+            <input
+              class="form-input"
+              type="number"
+              [(ngModel)]="imageForm.displayOrder"
+              name="displayOrder"
+              min="1"
+            />
+          </div>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="imageForm.isPrimary"
+              name="isPrimary"
+              [disabled]="isFirstImage()"
+            />
+            Imagen principal
+            @if (isFirstImage()) {
+              <span class="hint">(primera imagen, se marca automáticamente)</span>
+            }
+          </label>
+          <div class="dialog__actions">
+            <button class="btn btn--secondary" type="button" (click)="imageDialogOpen.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">
+              {{ editImageId() ? 'Guardar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (colorDialogOpen()) {
+    <div class="dialog-backdrop" (click)="colorDialogOpen.set(false)">
+      <div class="dialog" role="dialog" aria-label="Nuevo color" (click)="$event.stopPropagation()">
+        <h3>Nuevo color</h3>
+        <form
+          class="form"
+          #newColorFormRef="ngForm"
+          (ngSubmit)="
+            newColorFormRef.form.markAllAsTouched(); newColorFormRef.valid && saveNewColor()
+          "
+        >
+          <div class="form-group">
+            <label class="form-label">Nombre *</label>
+            <input
+              class="form-input"
+              [(ngModel)]="newColorForm.colorName"
+              name="newColorName"
+              required
+              maxlength="100"
+              placeholder="Ej: Oro amarillo"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Código de color *</label>
+            <div class="color-input-row">
+              <input
+                type="color"
+                class="color-picker"
+                [(ngModel)]="newColorForm.colorCode"
+                name="newColorCodePicker"
+              />
+              <input
+                class="form-input"
+                [(ngModel)]="newColorForm.colorCode"
+                name="newColorCode"
+                required
+                maxlength="7"
+                placeholder="#000000"
+              />
+            </div>
+          </div>
+          <div class="dialog__actions">
+            <button class="btn btn--secondary" type="button" (click)="colorDialogOpen.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">Crear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+}

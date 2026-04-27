@@ -1,0 +1,66 @@
+<app-page-header title="Proveedores" subtitle="Gestión de proveedores">
+  @if (auth.isGestor()) {
+    <a routerLink="/suppliers/new" class="btn btn--primary">+ Nuevo proveedor</a>
+  }
+</app-page-header>
+
+<div class="filters-bar">
+  <app-search-input placeholder="Buscar proveedor..." (searchChange)="onSearch($event)" />
+  <app-active-filter [value]="activeFilter()" (valueChange)="onActiveChange($event)" />
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (suppliers().length === 0) {
+  <app-empty-state
+    icon="🏭"
+    title="Sin proveedores"
+    message="No se encontraron proveedores con los filtros actuales."
+  />
+} @else {
+  <div class="card">
+    <app-entity-table
+      [columns]="columns"
+      [rows]="suppliers()"
+      [actions]="actions"
+      (actionClick)="onTableAction($event)"
+    />
+
+    <app-pagination
+      [currentPage]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="onPageChange($event)"
+    />
+  </div>
+}
+
+<app-confirm-dialog
+  [open]="confirmItem() !== null"
+  [title]="confirmItem()?.active ? 'Desactivar proveedor' : 'Activar proveedor'"
+  [message]="
+    '¿Confirmar ' +
+    (confirmItem()?.active ? 'desactivación' : 'activación') +
+    ' de ' +
+    (confirmItem()?.name ?? '') +
+    '?'
+  "
+  [destructive]="confirmItem()?.active === true"
+  [confirmLabel]="confirmItem()?.active ? 'Desactivar' : 'Activar'"
+  (confirm)="doToggle()"
+  (cancel)="confirmItem.set(null)"
+/>
+
+<app-confirm-dialog
+  [open]="confirmDeleteItem() !== null"
+  title="Eliminar proveedor"
+  [message]="
+    '¿Eliminar permanentemente a ' +
+    (confirmDeleteItem()?.name ?? '') +
+    '? Esta acción no se puede deshacer.'
+  "
+  [destructive]="true"
+  confirmLabel="Eliminar"
+  (confirm)="doDelete()"
+  (cancel)="confirmDeleteItem.set(null)"
+/>

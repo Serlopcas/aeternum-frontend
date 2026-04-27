@@ -1,0 +1,112 @@
+@if (!auth.isGestor()) {
+  <app-page-header title="Bienvenido" [subtitle]="'Hola, ' + auth.displayName()" />
+  <div class="card">
+    <p>Navega por el menú lateral para acceder a las secciones disponibles.</p>
+  </div>
+} @else {
+  <app-page-header title="Dashboard" subtitle="Visión general del negocio">
+    <span class="period-label">Datos de {{ currentMonthLabel }}</span>
+  </app-page-header>
+
+  <app-api-error-alert [error]="error()" />
+
+  @if (loading()) {
+    <app-loading-spinner />
+  } @else if (data(); as d) {
+    <div class="kpi-grid">
+      <a class="kpi-card" routerLink="/products">
+        <div class="kpi-card__icon">💎</div>
+        <div class="kpi-card__value">{{ d.totalActiveProducts }}</div>
+        <div class="kpi-card__label">Productos activos</div>
+      </a>
+      <a class="kpi-card" routerLink="/clients">
+        <div class="kpi-card__icon">🏪</div>
+        <div class="kpi-card__value">{{ d.totalActiveClients }}</div>
+        <div class="kpi-card__label">Clientes activos</div>
+      </a>
+      <a class="kpi-card" routerLink="/suppliers">
+        <div class="kpi-card__icon">🏭</div>
+        <div class="kpi-card__value">{{ d.totalActiveSuppliers }}</div>
+        <div class="kpi-card__label">Proveedores activos</div>
+      </a>
+      <a class="kpi-card kpi-card--warning" routerLink="/reports/stock-alerts">
+        <div class="kpi-card__icon">⚠️</div>
+        <div class="kpi-card__value">{{ d.lowStockVariantsCount }}</div>
+        <div class="kpi-card__label">Alertas de stock</div>
+      </a>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <h3 class="metric-card__title">Compras de {{ currentMonthLabel }}</h3>
+        <div class="metric-card__row">
+          <span>Pedidos</span>
+          <strong>{{ d.purchaseOrdersCountInPeriod }}</strong>
+        </div>
+        <div class="metric-card__row">
+          <span>Importe total</span>
+          <strong>{{ d.purchaseAmountTotalInPeriod | appCurrency }}</strong>
+        </div>
+      </div>
+      <div class="metric-card">
+        <h3 class="metric-card__title">Ventas de {{ currentMonthLabel }}</h3>
+        <div class="metric-card__row">
+          <span>Pedidos</span>
+          <strong>{{ d.salesOrdersCountInPeriod }}</strong>
+        </div>
+        <div class="metric-card__row">
+          <span>Facturación</span>
+          <strong>{{ d.salesRevenueTotalInPeriod | appCurrency }}</strong>
+        </div>
+      </div>
+      <div class="metric-card metric-card--highlight">
+        <h3 class="metric-card__title">Margen bruto de {{ currentMonthLabel }}</h3>
+        <div class="metric-card__big">{{ d.marginTotalInPeriod | appCurrency }}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px">
+      <div class="alerts-header">
+        <h3 class="section-title">Alertas de stock bajo</h3>
+        <select
+          class="filter-select"
+          (change)="onSellableChange($any($event.target).value)"
+          aria-label="Filtrar alertas por tipo de variante"
+        >
+          <option value="">Todas las variantes</option>
+          <option value="true">Solo vendibles</option>
+          <option value="false">Solo no vendibles</option>
+        </select>
+      </div>
+      @if (stockAlerts().length > 0) {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Producto</th>
+              <th>Stock actual</th>
+              <th>Mínimo</th>
+              <th>Déficit</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of stockAlerts(); track a.variantId) {
+              <tr>
+                <td class="font-mono">{{ a.sku }}</td>
+                <td>{{ a.productName }}</td>
+                <td class="text-right">{{ a.currentStock }}</td>
+                <td class="text-right">{{ a.minimumStock }}</td>
+                <td class="text-right text-danger">{{ a.differenceToMinimum }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="empty-msg">No hay variantes con stock por debajo del mínimo.</p>
+      }
+      <div style="margin-top: 12px">
+        <a routerLink="/reports/stock-alerts" class="link">Ver todas las alertas →</a>
+      </div>
+    </div>
+  }
+}

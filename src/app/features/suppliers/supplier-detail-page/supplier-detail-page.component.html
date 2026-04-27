@@ -1,0 +1,531 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (supplier()) {
+  <app-page-header [title]="supplier()!.name" subtitle="Detalle del proveedor">
+    <a routerLink="/suppliers" class="btn btn--secondary">← Volver</a>
+  </app-page-header>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="tab() === 'info'" (click)="switchTab('info')">
+      Información
+    </button>
+    <button class="tab" [class.active]="tab() === 'contacts'" (click)="switchTab('contacts')">
+      Contactos ({{ supplier()!.contacts.length }})
+    </button>
+    <button class="tab" [class.active]="tab() === 'addresses'" (click)="switchTab('addresses')">
+      Direcciones ({{ supplier()!.addresses.length }})
+    </button>
+    @if (!isNew) {
+      <button class="tab" [class.active]="tab() === 'catalog'" (click)="switchTab('catalog')">
+        Catálogo
+      </button>
+      <button class="tab" [class.active]="tab() === 'purchases'" (click)="switchTab('purchases')">
+        Histórico de compras
+      </button>
+    }
+  </div>
+
+  @if (tab() === 'info') {
+    <div class="card">
+      @if (editMode()) {
+        <form
+          class="form"
+          #supplierInfoForm="ngForm"
+          (ngSubmit)="
+            supplierInfoForm.form.markAllAsTouched(); supplierInfoForm.valid && saveInfo()
+          "
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre *</label>
+              <input
+                class="form-input"
+                [(ngModel)]="editData.name"
+                name="name"
+                #supNameRef="ngModel"
+                required
+                maxlength="150"
+              />
+              @if (supNameRef.invalid && supNameRef.touched) {
+                <small class="form-error">El nombre es obligatorio</small>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">CIF/NIF *</label>
+              <input
+                class="form-input"
+                [(ngModel)]="editData.taxId"
+                name="taxId"
+                #supTaxRef="ngModel"
+                required
+                maxlength="50"
+              />
+              @if (supTaxRef.invalid && supTaxRef.touched) {
+                <small class="form-error">El CIF/NIF es obligatorio</small>
+              }
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Web</label>
+            <input
+              class="form-input"
+              [(ngModel)]="editData.websiteUrl"
+              name="websiteUrl"
+              maxlength="255"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notas</label>
+            <textarea
+              class="form-input"
+              [(ngModel)]="editData.notes"
+              name="notes"
+              rows="3"
+              maxlength="1000"
+            ></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn--secondary" type="button" (click)="editMode.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">Guardar</button>
+          </div>
+        </form>
+      } @else {
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">CIF/NIF</span><span>{{ supplier()!.taxId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Web</span><span>{{ supplier()!.websiteUrl ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Estado</span>
+            <app-status-badge
+              [label]="supplier()!.active ? 'Activo' : 'Inactivo'"
+              [colorClass]="getActiveColor(supplier()!.active)"
+            />
+          </div>
+        </div>
+        @if (supplier()!.notes) {
+          <div class="notes-section">
+            <span class="info-label">Notas</span>
+            <p>{{ supplier()!.notes }}</p>
+          </div>
+        }
+        @if (auth.isGestor()) {
+          <div class="form-actions">
+            <button class="btn btn--secondary" (click)="startEdit()">Editar</button>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (tab() === 'contacts') {
+    <div class="card">
+      @if (auth.isGestor()) {
+        <div class="tab-header">
+          <button class="btn btn--primary btn--sm" (click)="openContactDialog()">
+            + Añadir contacto
+          </button>
+        </div>
+      }
+      @if (!supplier()!.contacts.length) {
+        <p class="empty-msg">No hay contactos registrados.</p>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Cargo</th>
+              @if (auth.isGestor()) {
+                <th>Acciones</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of supplier()!.contacts; track c.id) {
+              <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.email ?? '—' }}</td>
+                <td>{{ c.phone ?? '—' }}</td>
+                <td>{{ c.positionName ?? '—' }}</td>
+                @if (auth.isGestor()) {
+                  <td>
+                    <div class="action-btns">
+                      <button class="action-btn" (click)="openContactDialog(c)">Editar</button>
+                      <button class="action-btn action-btn--danger" (click)="deleteContact(c.id)">
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  @if (tab() === 'addresses') {
+    <div class="card">
+      @if (auth.isGestor()) {
+        <div class="tab-header">
+          <button class="btn btn--primary btn--sm" (click)="openAddressDialog()">
+            + Añadir dirección
+          </button>
+        </div>
+      }
+      @if (!supplier()!.addresses.length) {
+        <p class="empty-msg">No hay direcciones registradas.</p>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Etiqueta</th>
+              <th>Dirección</th>
+              <th>Ciudad</th>
+              <th>Código postal</th>
+              @if (auth.isGestor()) {
+                <th>Acciones</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of supplier()!.addresses; track a.id) {
+              <tr>
+                <td>{{ a.label }}</td>
+                <td>{{ a.addressLine1 }}</td>
+                <td>{{ a.city }}</td>
+                <td>{{ a.postalCode ?? '—' }}</td>
+                @if (auth.isGestor()) {
+                  <td>
+                    <div class="action-btns">
+                      <button class="action-btn" (click)="openAddressDialog(a)">Editar</button>
+                      <button class="action-btn action-btn--danger" (click)="deleteAddress(a.id)">
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  @if (tab() === 'catalog') {
+    <div class="card">
+      @if (auth.isGestor()) {
+        <div class="card__header">
+          <button class="btn btn--sm" (click)="openLinkDialog()">+ Añadir variante</button>
+        </div>
+      }
+      @if (catalogLoading()) {
+        <app-loading-spinner />
+      } @else if (catalogGrouped().length === 0) {
+        <p class="empty-msg">Este proveedor no tiene variantes vinculadas.</p>
+      } @else {
+        @for (cat of catalogGrouped(); track cat.id) {
+          <div class="catalog-category">
+            <h3 class="catalog-category__title">{{ cat.name }}</h3>
+            @for (prod of cat.products; track prod.id) {
+              <div class="catalog-product">
+                <h4 class="catalog-product__title">
+                  <span class="catalog-product__code">{{ prod.code }}</span>
+                  {{ prod.name }}
+                </h4>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>SKU</th>
+                      <th>Material</th>
+                      <th>Color</th>
+                      <th>{{ cat.measureLabel }}</th>
+                      <th>Ref. proveedor</th>
+                      <th>Coste</th>
+                      <th>Estado</th>
+                      @if (auth.isGestor()) {
+                        <th>Acciones</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (v of prod.variants; track v.supplierProductVariantId) {
+                      <tr [class.row--inactive]="!v.active">
+                        <td>{{ v.material }}{{ v.color ? ' · ' + v.color : '' }}</td>
+                        <td class="font-mono">{{ v.sku }}</td>
+                        <td>{{ v.material }}</td>
+                        <td>{{ v.color ?? '—' }}</td>
+                        <td>{{ v.primaryMeasureValue ?? '—' }}</td>
+                        <td>{{ v.supplierReference ?? '—' }}</td>
+                        <td>{{ v.basePurchaseCost != null ? v.basePurchaseCost + ' €' : '—' }}</td>
+                        <td>
+                          @if (v.preferredSupplier) {
+                            <span class="badge badge--preferred">★ Preferido</span>
+                          }
+                          @if (!v.active) {
+                            <span class="badge badge--inactive">Inactivo</span>
+                          }
+                        </td>
+                        @if (auth.isGestor()) {
+                          <td>
+                            <div class="action-btns">
+                              <button class="action-btn" (click)="toggleCatalogLink(v)">
+                                {{ v.active ? 'Desact.' : 'Act.' }}
+                              </button>
+                            </div>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (tab() === 'purchases') {
+    <app-purchases-list-page [supplierId]="supplier()!.id" />
+  }
+
+  @if (linkDialogOpen()) {
+    <div class="dialog-backdrop" (click)="linkDialogOpen.set(false)">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <h3>Vincular variante</h3>
+        <form
+          class="form"
+          #linkVarForm="ngForm"
+          (ngSubmit)="linkVarForm.form.markAllAsTouched(); linkVarForm.valid && saveLinkVariant()"
+        >
+          <div class="form-group">
+            <label class="form-label">Producto *</label>
+            <select
+              class="form-input"
+              name="product"
+              [ngModel]="linkSelectedProduct()?.id ?? 0"
+              (ngModelChange)="onLinkProductChange($event)"
+              required
+            >
+              <option [value]="0" disabled>— Selecciona un producto —</option>
+              @for (p of linkProducts(); track p.id) {
+                <option [ngValue]="p.id">{{ p.productCode }} — {{ p.name }}</option>
+              }
+            </select>
+          </div>
+          @if (linkVariants().length > 0) {
+            <div class="form-group">
+              <label class="form-label">Variante *</label>
+              <select class="form-input" [(ngModel)]="linkForm.variantId" name="variant" required>
+                <option [value]="0" disabled>— Selecciona una variante —</option>
+                @for (v of linkVariants(); track v.id) {
+                  <option [ngValue]="v.id">{{ variantLabel(v) }}</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Referencia proveedor</label>
+              <input
+                class="form-input"
+                [(ngModel)]="linkForm.supplierReference"
+                name="supplierReference"
+                maxlength="100"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Coste base *</label>
+              <input
+                class="form-input"
+                type="number"
+                [(ngModel)]="linkForm.basePurchaseCost"
+                name="basePurchaseCost"
+                required
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+          <div class="dialog__actions">
+            <button type="button" class="btn btn--outline" (click)="linkDialogOpen.set(false)">
+              Cancelar
+            </button>
+            <button type="submit" class="btn">Vincular</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (contactDialogOpen()) {
+    <div class="dialog-backdrop" (click)="contactDialogOpen.set(false)">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <h3>{{ editContactId() ? 'Editar contacto' : 'Nuevo contacto' }}</h3>
+        <form
+          class="form"
+          #supplierContactForm="ngForm"
+          (ngSubmit)="
+            supplierContactForm.form.markAllAsTouched(); supplierContactForm.valid && saveContact()
+          "
+        >
+          <div class="form-group">
+            <label class="form-label">Nombre *</label>
+            <input
+              class="form-input"
+              [(ngModel)]="contactForm.name"
+              name="name"
+              #supContactNameRef="ngModel"
+              required
+              maxlength="150"
+            />
+            @if (supContactNameRef.invalid && supContactNameRef.touched) {
+              <small class="form-error">El nombre es obligatorio</small>
+            }
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                class="form-input"
+                type="email"
+                [(ngModel)]="contactForm.email"
+                name="email"
+                maxlength="150"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input
+                class="form-input"
+                [(ngModel)]="contactForm.phone"
+                name="phone"
+                maxlength="30"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cargo</label>
+            <input
+              class="form-input"
+              [(ngModel)]="contactForm.positionName"
+              name="positionName"
+              maxlength="100"
+            />
+          </div>
+          <div class="dialog__actions">
+            <button class="btn btn--secondary" type="button" (click)="contactDialogOpen.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">
+              {{ editContactId() ? 'Guardar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (addressDialogOpen()) {
+    <div class="dialog-backdrop" (click)="addressDialogOpen.set(false)">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <h3>{{ editAddressId() ? 'Editar dirección' : 'Nueva dirección' }}</h3>
+        <form
+          class="form"
+          #supplierAddressForm="ngForm"
+          (ngSubmit)="
+            supplierAddressForm.form.markAllAsTouched(); supplierAddressForm.valid && saveAddress()
+          "
+        >
+          <div class="form-group">
+            <label class="form-label">Etiqueta</label>
+            <input
+              class="form-input"
+              [(ngModel)]="addressForm.label"
+              name="label"
+              maxlength="100"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección *</label>
+            <input
+              class="form-input"
+              [(ngModel)]="addressForm.addressLine1"
+              name="addressLine1"
+              #supAddrRef="ngModel"
+              required
+              maxlength="200"
+            />
+            @if (supAddrRef.invalid && supAddrRef.touched) {
+              <small class="form-error">La dirección es obligatoria</small>
+            }
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ciudad *</label>
+              <input
+                class="form-input"
+                [(ngModel)]="addressForm.city"
+                name="city"
+                #supCityRef="ngModel"
+                required
+                maxlength="100"
+              />
+              @if (supCityRef.invalid && supCityRef.touched) {
+                <small class="form-error">La ciudad es obligatoria</small>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">Provincia</label>
+              <input
+                class="form-input"
+                [(ngModel)]="addressForm.province"
+                name="province"
+                maxlength="100"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Código postal</label>
+              <input
+                class="form-input"
+                [(ngModel)]="addressForm.postalCode"
+                name="postalCode"
+                maxlength="20"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">País</label>
+              <input
+                class="form-input"
+                [(ngModel)]="addressForm.country"
+                name="country"
+                maxlength="100"
+              />
+            </div>
+          </div>
+          <div class="dialog__actions">
+            <button class="btn btn--secondary" type="button" (click)="addressDialogOpen.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">
+              {{ editAddressId() ? 'Guardar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+}

@@ -1,0 +1,325 @@
+<app-page-header title="Inventario" subtitle="Movimientos y ajustes de stock">
+  @if (auth.isGestor() || auth.isTrabajador()) {
+    <button
+      class="btn btn--primary"
+      (click)="showAdjustDialog = true"
+      aria-label="Nuevo ajuste de inventario"
+    >
+      + Ajuste
+    </button>
+  }
+</app-page-header>
+
+<div class="tabs">
+  <button
+    class="tab"
+    [class.active]="tab() === 'movements'"
+    (click)="switchTab('movements')"
+    aria-label="Ver movimientos de inventario"
+  >
+    Movimientos
+  </button>
+  <button
+    class="tab"
+    [class.active]="tab() === 'stock'"
+    (click)="switchTab('stock')"
+    aria-label="Consultar stock"
+  >
+    Consulta de stock
+  </button>
+</div>
+
+@if (tab() === 'movements') {
+  <div class="filters-grid">
+    <div class="filters-row">
+      <app-search-input
+        placeholder="Buscar por SKU o producto..."
+        (searchChange)="movQuery = $event; loadMovements()"
+      />
+      <select
+        class="form-input filter-select"
+        [(ngModel)]="movType"
+        (ngModelChange)="loadMovements()"
+        aria-label="Filtrar por tipo de movimiento"
+      >
+        <option value="">Todos los tipos</option>
+        <option value="PURCHASE_IN">Entrada compra</option>
+        <option value="SALE_OUT">Salida venta</option>
+        <option value="ADJUSTMENT_IN">Ajuste entrada</option>
+        <option value="ADJUSTMENT_OUT">Ajuste salida</option>
+      </select>
+      <div class="page-size-selector">
+        <label class="date-range__label">Filas</label>
+        <select
+          class="form-input filter-select--sm"
+          [(ngModel)]="movPageSize"
+          (ngModelChange)="movPageNum = 0; loadMovements()"
+          aria-label="Filas por página"
+        >
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="25">25</option>
+          <option [ngValue]="50">50</option>
+        </select>
+      </div>
+    </div>
+    <div class="filters-row">
+      <div class="date-range">
+        <div class="date-range__field">
+          <label class="date-range__label">Desde</label>
+          <input
+            type="date"
+            class="date-range__input"
+            max="9999-12-31"
+            [(ngModel)]="movDateFrom"
+            (ngModelChange)="movDate$.next()"
+            aria-label="Fecha desde"
+          />
+        </div>
+        <div class="date-range__field">
+          <label class="date-range__label">Hasta</label>
+          <input
+            type="date"
+            class="date-range__input"
+            max="9999-12-31"
+            [(ngModel)]="movDateTo"
+            (ngModelChange)="movDate$.next()"
+            aria-label="Fecha hasta"
+          />
+        </div>
+      </div>
+      <div class="quick-dates">
+        <button class="btn btn--secondary btn--sm" (click)="setCurrentMonth()">Mes actual</button>
+        <button class="btn btn--secondary btn--sm" (click)="setLastMonth()">Último mes</button>
+        <button class="btn btn--secondary btn--sm" (click)="setCurrentQuarter()">
+          Trimestre actual
+        </button>
+        <button class="btn btn--secondary btn--sm" (click)="setCurrentYear()">Año actual</button>
+      </div>
+    </div>
+  </div>
+
+  @if (movLoading()) {
+    <app-loading-spinner />
+  } @else if (!movPage()?.content?.length) {
+    <app-empty-state message="Sin movimientos que mostrar." />
+  } @else {
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Cant.</th>
+            <th>Doc. ref.</th>
+            <th>Motivo ajuste</th>
+            <th>Notas</th>
+            <th>Usuario</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of movPage()!.content; track m.id) {
+            <tr>
+              <td>{{ m.movementDate | appDateTime }}</td>
+              <td class="font-mono">{{ m.variantSku }}</td>
+              <td>{{ m.productName }}</td>
+              <td>
+                <span class="type-badge" [class]="getMovClass(m.movementType)">{{
+                  getMovLabel(m.movementType)
+                }}</span>
+              </td>
+              <td [class.qty-in]="m.quantity > 0" [class.qty-out]="m.quantity < 0">
+                {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+              </td>
+              <td>
+                {{
+                  m.purchaseOrderId
+                    ? 'Compra #' + m.purchaseOrderId
+                    : m.salesOrderId
+                      ? 'Venta #' + m.salesOrderId
+                      : '—'
+                }}
+              </td>
+              <td>{{ m.adjustmentReasonName ?? '—' }}</td>
+              <td>{{ m.notes ?? '—' }}</td>
+              <td>{{ m.performedByUsername }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination
+      [currentPage]="movPage()!.number"
+      [totalPages]="movPage()!.totalPages"
+      [totalElements]="movPage()!.totalElements"
+      (pageChange)="movPageNum = $event; loadMovements()"
+    />
+  }
+}
+
+@if (tab() === 'stock') {
+  <div class="filters-bar">
+    <app-search-input
+      placeholder="Buscar por SKU, producto, material..."
+      (searchChange)="onStockSearch($event)"
+    />
+    <select
+      class="form-input filter-select"
+      [ngModel]="stockCategoryFilter()"
+      (ngModelChange)="onStockCategoryChange($event)"
+      aria-label="Filtrar por categoría"
+    >
+      <option [ngValue]="undefined">Todas las categorías</option>
+      @for (cat of flatCategories(); track cat.id) {
+        <option [ngValue]="cat.id">{{ cat.label }}</option>
+      }
+    </select>
+    <app-active-filter [value]="stockActiveFilter()" (valueChange)="onStockActiveFilter($event)" />
+    <div class="page-size-selector">
+      <label class="date-range__label">Productos</label>
+      <select
+        class="form-input filter-select--sm"
+        [(ngModel)]="stockPageSize"
+        (ngModelChange)="stockPageNum = 0; loadStocks()"
+        aria-label="Filas por página"
+      >
+        <option [ngValue]="10">10</option>
+        <option [ngValue]="25">25</option>
+        <option [ngValue]="50">50</option>
+      </select>
+    </div>
+  </div>
+
+  @if (stockLoading()) {
+    <app-loading-spinner />
+  } @else if (!stockPage()?.content?.length) {
+    <app-empty-state message="No se encontraron variantes." />
+  } @else {
+    <div class="stock-cards">
+      @for (s of stockPage()!.content; track s.variantId) {
+        <div class="stock-card" [class.stock-card--inactive]="!s.active">
+          <div class="stock-card__header">
+            <span class="stock-card__sku">{{ s.sku }}</span>
+            @if (!s.active) {
+              <span class="stock-card__badge stock-card__badge--inactive">Inactivo</span>
+            }
+            @if (s.isBelowMinimum) {
+              <span class="stock-card__badge stock-card__badge--alert">⚠ Bajo mínimo</span>
+            }
+          </div>
+          <div class="stock-card__product">{{ s.productName }}</div>
+          <div class="stock-card__metrics">
+            <div class="stock-card__metric">
+              <span class="stock-card__metric-label">Stock actual</span>
+              <span
+                class="stock-card__metric-value"
+                [class.stock-card__metric-value--low]="s.isBelowMinimum"
+                >{{ s.currentStock }}</span
+              >
+            </div>
+            <div class="stock-card__metric">
+              <span class="stock-card__metric-label">Stock mínimo</span>
+              <span class="stock-card__metric-value stock-card__metric-value--secondary">{{
+                s.minimumStock
+              }}</span>
+            </div>
+            <div class="stock-card__metric">
+              <span class="stock-card__metric-label">Vendible</span>
+              <span class="stock-card__metric-value stock-card__metric-value--secondary">{{
+                s.isSellable ? 'Sí' : 'No'
+              }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+    <app-pagination
+      [currentPage]="stockPage()!.number"
+      [totalPages]="stockPage()!.totalPages"
+      [totalElements]="stockPage()!.totalElements"
+      (pageChange)="onStockPageChange($event)"
+    />
+  }
+}
+
+@if (showAdjustDialog) {
+  <div class="backdrop" (click)="showAdjustDialog = false"></div>
+  <div class="dialog" role="dialog" aria-label="Nuevo ajuste de inventario">
+    <h3>Nuevo ajuste de inventario</h3>
+    <div class="form-group">
+      <label class="form-label">Buscar variante</label>
+      <input
+        class="form-input"
+        placeholder="SKU o nombre..."
+        [(ngModel)]="adjQuery"
+        (input)="searchAdjVariant()"
+      />
+      @if (adjVariants().length) {
+        <ul class="variant-list">
+          @for (v of adjVariants(); track v.id) {
+            <li (click)="selectAdjVariant(v)">
+              <span class="font-mono">{{ v.sku }}</span> — {{ v.productName }}
+              {{ v.material ?? '' }} {{ v.color ?? '' }}
+            </li>
+          }
+        </ul>
+      }
+      @if (adjSelectedVariant()) {
+        <div class="selected-variant">
+          <span class="font-mono">{{ adjSelectedVariant()!.sku }}</span> —
+          {{ adjSelectedVariant()!.productName }}
+        </div>
+      }
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo de ajuste</label>
+      <select class="form-input" [(ngModel)]="adjType">
+        <option value="ADJUSTMENT_IN">Entrada</option>
+        <option value="ADJUSTMENT_OUT">Salida</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cantidad</label>
+      <input type="number" class="form-input" [(ngModel)]="adjQty" min="1" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Motivo *</label>
+      <select
+        class="form-input"
+        required
+        name="adjReasonId"
+        #reasonRef="ngModel"
+        [(ngModel)]="adjReasonId"
+      >
+        <option [ngValue]="null" disabled>Seleccionar...</option>
+        @for (r of adjustmentReasons(); track r.id) {
+          <option [ngValue]="r.id">{{ r.name }}</option>
+        }
+      </select>
+      @if (reasonRef.invalid && reasonRef.touched) {
+        <span class="form-error">Selecciona un motivo</span>
+      }
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notas</label>
+      <textarea class="form-input" rows="2" [(ngModel)]="adjNotes"></textarea>
+    </div>
+    <div class="dialog-actions">
+      <button
+        class="btn btn--secondary"
+        (click)="showAdjustDialog = false"
+        aria-label="Cancelar ajuste"
+      >
+        Cancelar
+      </button>
+      <button
+        class="btn btn--primary"
+        (click)="submitAdjustment()"
+        [disabled]="!adjSelectedVariant() || adjQty < 1 || !adjReasonId"
+      >
+        Crear ajuste
+      </button>
+    </div>
+  </div>
+}

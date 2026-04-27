@@ -1,0 +1,126 @@
+<app-page-header title="Informe de margen" subtitle="Análisis de rentabilidad por venta" />
+
+<div class="filters-bar">
+  <div class="date-range">
+    <div class="date-range__field">
+      <label class="date-range__label">Desde</label>
+      <input
+        type="date"
+        class="date-range__input"
+        max="9999-12-31"
+        [(ngModel)]="dateFrom"
+        (ngModelChange)="onDateChange()"
+        aria-label="Fecha desde"
+      />
+    </div>
+    <div class="date-range__field">
+      <label class="date-range__label">Hasta</label>
+      <input
+        type="date"
+        class="date-range__input"
+        max="9999-12-31"
+        [(ngModel)]="dateTo"
+        (ngModelChange)="onDateChange()"
+        aria-label="Fecha hasta"
+      />
+    </div>
+  </div>
+  <div class="quick-dates">
+    <button class="btn btn--secondary btn--sm" (click)="setCurrentMonth()">Mes actual</button>
+    <button class="btn btn--secondary btn--sm" (click)="setLastMonth()">Último mes</button>
+    <button class="btn btn--secondary btn--sm" (click)="setCurrentQuarter()">
+      Trimestre actual
+    </button>
+    <button class="btn btn--secondary btn--sm" (click)="setCurrentYear()">Año actual</button>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (report()) {
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <span class="kpi-label">Ingresos</span>
+      <span class="kpi-value">{{ report()!.revenueTotal | appCurrency }}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Coste</span>
+      <span class="kpi-value cost">{{ report()!.costTotal | appCurrency }}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Margen</span>
+      <span class="kpi-value margin" [class.negative]="report()!.marginTotal < 0">{{
+        report()!.marginTotal | appCurrency
+      }}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">% Margen</span>
+      <span class="kpi-value margin" [class.negative]="report()!.marginPercent < 0">{{
+        report()!.marginPercent | appPercent
+      }}</span>
+    </div>
+  </div>
+
+  @if (!report()!.lines.length) {
+    <app-empty-state message="Sin líneas para el período seleccionado." />
+  } @else {
+    <div class="card">
+      <h4>Detalle por línea de venta</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nº Venta</th>
+            <th>Cliente</th>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>Cant.</th>
+            <th>Precio ud.</th>
+            <th>Coste ud.</th>
+            <th class="sortable" (click)="toggleSort('lineRevenue')">
+              Ingreso <span class="sort-icon">{{ sortIcon('lineRevenue') }}</span>
+            </th>
+            <th class="sortable" (click)="toggleSort('lineCost')">
+              Coste <span class="sort-icon">{{ sortIcon('lineCost') }}</span>
+            </th>
+            <th class="sortable" (click)="toggleSort('lineMargin')">
+              Margen <span class="sort-icon">{{ sortIcon('lineMargin') }}</span>
+            </th>
+            <th class="sortable" (click)="toggleSort('lineMarginPercent')">
+              % Margen <span class="sort-icon">{{ sortIcon('lineMarginPercent') }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (l of sortedLines(); track l.salesOrderId + '-' + l.variantId) {
+            <tr>
+              <td>{{ l.saleNumber }}</td>
+              <td>{{ l.clientName }}</td>
+              <td class="font-mono">{{ l.sku }}</td>
+              <td>{{ l.productName }}</td>
+              <td>{{ l.quantitySold }}</td>
+              <td>{{ l.unitPriceSnapshot | appCurrency }}</td>
+              <td>{{ l.unitCostSnapshot | appCurrency }}</td>
+              <td>{{ l.lineRevenue | appCurrency }}</td>
+              <td>{{ l.lineCost | appCurrency }}</td>
+              <td [class.positive]="l.lineMargin >= 0" [class.negative]="l.lineMargin < 0">
+                {{ l.lineMargin | appCurrency }}
+              </td>
+              <td
+                [class.positive]="l.lineMarginPercent >= 0"
+                [class.negative]="l.lineMarginPercent < 0"
+              >
+                {{ l.lineMarginPercent | appPercent }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination
+      [currentPage]="report()!.currentPage"
+      [totalPages]="report()!.totalPages"
+      [totalElements]="report()!.totalElements"
+      (pageChange)="pageNum = $event; load()"
+    />
+  }
+}

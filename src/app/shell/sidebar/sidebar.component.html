@@ -1,0 +1,37 @@
+<aside class="sidebar" [class.sidebar--collapsed]="collapsed()">
+  <div class="sidebar__brand">
+    <span class="sidebar__logo">◆</span>
+    @if (!collapsed()) {
+      <span class="sidebar__name">Aeternum</span>
+    }
+  </div>
+
+  <nav class="sidebar__nav" aria-label="Menú principal">
+    @for (section of filteredSections(); track section.title) {
+      @if (!collapsed()) {
+        <div class="sidebar__section-title">{{ section.title }}</div>
+      }
+      @for (item of section.items; track item.route) {
+        <a
+          class="sidebar__item"
+          [routerLink]="item.route"
+          [class.sidebar__item--active]="isItemActive(item.route)"
+          [title]="item.label"
+        >
+          <span class="sidebar__item-icon">{{ item.icon }}</span>
+          @if (!collapsed()) {
+            <span class="sidebar__item-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    }
+  </nav>
+
+  <button
+    class="sidebar__toggle"
+    (click)="collapsed.set(!collapsed())"
+    [attr.aria-label]="collapsed() ? 'Expandir menú lateral' : 'Contraer menú lateral'"
+  >
+    {{ collapsed() ? '»' : '«' }}
+  </button>
+</aside>

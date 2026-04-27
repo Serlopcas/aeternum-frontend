@@ -1,0 +1,659 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (variant()) {
+  <app-page-header [title]="variant()!.sku" [subtitle]="variant()!.productName">
+    <button class="btn btn--secondary" (click)="goBack()">
+      ← {{ fromVariants ? 'Volver a Variantes' : 'Volver al producto' }}
+    </button>
+  </app-page-header>
+
+  <div class="tabs">
+    <button
+      class="tab"
+      [class.active]="tab() === 'info'"
+      (click)="tab.set('info')"
+      aria-label="Pestaña información"
+    >
+      Información
+    </button>
+    <button
+      class="tab"
+      [class.active]="tab() === 'images'"
+      (click)="tab.set('images')"
+      aria-label="Pestaña imágenes"
+    >
+      Imágenes ({{ variant()!.images?.length ?? 0 }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="tab() === 'suppliers'"
+      (click)="loadSuppliers()"
+      aria-label="Pestaña proveedores"
+    >
+      Proveedores ({{ variant()!.supplierLinks?.length ?? 0 }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="tab() === 'priceHistory'"
+      (click)="loadPriceHistory()"
+      aria-label="Pestaña historial de precios"
+    >
+      Historial precios
+    </button>
+    <button
+      class="tab"
+      [class.active]="tab() === 'movements'"
+      (click)="loadMovements()"
+      aria-label="Pestaña movimientos de stock"
+    >
+      Movimientos
+    </button>
+  </div>
+
+  @if (tab() === 'info') {
+    <div class="card">
+      @if (editMode()) {
+        <form
+          class="form"
+          #variantEditForm="ngForm"
+          (ngSubmit)="
+            variantEditForm.form.markAllAsTouched(); variantEditForm.valid && saveVariant()
+          "
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">SKU *</label>
+              <input
+                class="form-input"
+                [(ngModel)]="form.sku"
+                name="sku"
+                #editSkuRef="ngModel"
+                required
+                maxlength="60"
+              />
+              @if (editSkuRef.invalid && editSkuRef.touched) {
+                <small class="form-error">El SKU es obligatorio</small>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">Material</label>
+              <input
+                class="form-input"
+                [(ngModel)]="form.material"
+                name="material"
+                maxlength="50"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <input class="form-input" [(ngModel)]="form.color" name="color" maxlength="50" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acabado</label>
+              <input class="form-input" [(ngModel)]="form.finish" name="finish" maxlength="50" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Pureza</label>
+              <input class="form-input" [(ngModel)]="form.purity" name="purity" maxlength="50" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Peso (g)</label>
+              <input
+                class="form-input"
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="form.weightGrams"
+                name="weightGrams"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Precio venta base</label>
+              <input
+                class="form-input"
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="form.baseSalePrice"
+                name="baseSalePrice"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock mínimo</label>
+              <input
+                class="form-input"
+                type="number"
+                min="0"
+                [(ngModel)]="form.minimumStock"
+                name="minimumStock"
+              />
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="form.isSellable" name="isSellable" /> Vendible
+          </label>
+          <div class="form-group">
+            <label class="form-label">Notas internas</label>
+            <textarea
+              class="form-input"
+              [(ngModel)]="form.internalNotes"
+              name="internalNotes"
+              rows="2"
+              maxlength="2000"
+            ></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn--secondary" type="button" (click)="editMode.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">Guardar</button>
+          </div>
+        </form>
+      } @else {
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">SKU</span><span class="font-mono">{{ variant()!.sku }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Producto</span
+            ><span>{{ variant()!.productName }} ({{ variant()!.productCode }})</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Material</span><span>{{ variant()!.material ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Color</span><span>{{ variant()!.color ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Acabado</span><span>{{ variant()!.finish ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Pureza</span><span>{{ variant()!.purity ?? '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Peso</span
+            ><span>{{ variant()!.weightGrams ? variant()!.weightGrams + ' g' : '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Precio venta</span
+            ><span>{{ variant()!.baseSalePrice | appCurrency }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Stock mínimo</span><span>{{ variant()!.minimumStock }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Vendible</span
+            ><span>{{ variant()!.isSellable ? 'Sí' : 'No' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Estado</span>
+            <app-status-badge
+              [label]="variant()!.active ? 'Activo' : 'Inactivo'"
+              [colorClass]="getColor(variant()!.active)"
+            />
+          </div>
+        </div>
+        @if (auth.isGestor()) {
+          <div class="form-actions">
+            <button class="btn btn--secondary" (click)="startEdit()" aria-label="Editar variante">
+              Editar
+            </button>
+            <button
+              class="btn"
+              [class.btn--danger]="variant()!.active"
+              [class.btn--primary]="!variant()!.active"
+              (click)="confirmToggle.set(true)"
+            >
+              {{ variant()!.active ? 'Desactivar' : 'Activar' }}
+            </button>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (tab() === 'images') {
+    <div class="card">
+      @if (auth.isGestor()) {
+        <div class="tab-header">
+          <button
+            class="btn btn--primary btn--sm"
+            (click)="openImageDialog()"
+            aria-label="Añadir nueva imagen"
+          >
+            + Añadir imagen
+          </button>
+        </div>
+      }
+      @if (!variant()!.images?.length) {
+        <p class="empty-msg">No hay imágenes registradas.</p>
+      } @else {
+        <div class="images-grid">
+          @for (img of variant()!.images; track img.id) {
+            <div class="image-card" [class.primary]="img.isPrimary" [class.inactive]="!img.active">
+              <img
+                [src]="img.publicUrl"
+                [alt]="img.altText ?? 'Imagen de variante'"
+                class="image-thumb"
+                (error)="onImageError($event)"
+              />
+              <div class="image-info">
+                @if (img.isPrimary) {
+                  <span class="primary-badge">Principal</span>
+                }
+                <span class="image-order">Orden: {{ img.displayOrder }}</span>
+              </div>
+              @if (auth.isGestor()) {
+                <div class="image-actions">
+                  <button class="action-btn" (click)="editImage(img)" aria-label="Editar imagen">
+                    Editar
+                  </button>
+                  <button
+                    class="action-btn action-btn--danger"
+                    (click)="askDeleteImage(img)"
+                    aria-label="Eliminar imagen"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <app-confirm-dialog
+    [open]="confirmDeleteImage() !== null"
+    title="Eliminar imagen"
+    message="¿Eliminar esta imagen? Se borrará permanentemente del servidor."
+    [destructive]="true"
+    confirmLabel="Eliminar"
+    (confirm)="doDeleteImage()"
+    (cancel)="confirmDeleteImage.set(null)"
+  />
+
+  @if (tab() === 'suppliers') {
+    <div class="card">
+      @if (auth.isGestor()) {
+        <div class="tab-header">
+          <button
+            class="btn btn--primary btn--sm"
+            (click)="openSupplierLinkDialog()"
+            aria-label="Vincular nuevo proveedor"
+          >
+            + Vincular proveedor
+          </button>
+        </div>
+      }
+      @if (!variant()!.supplierLinks?.length) {
+        <p class="empty-msg">No hay proveedores vinculados.</p>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Proveedor</th>
+              <th>Ref. proveedor</th>
+              <th>Coste</th>
+              <th>Plazo entrega</th>
+              <th>Preferido</th>
+              <th>Estado</th>
+              @if (auth.isGestor()) {
+                <th>Acciones</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (sl of variant()!.supplierLinks; track sl.id) {
+              <tr [class.row--inactive]="!sl.active">
+                <td>{{ sl.supplierName }}</td>
+                <td class="font-mono">{{ sl.supplierReference ?? '—' }}</td>
+                <td>{{ sl.basePurchaseCost | appCurrency }}</td>
+                <td>{{ sl.leadTimeDays ? sl.leadTimeDays + ' días' : '—' }}</td>
+                <td>{{ sl.isPreferredSupplier ? '⭐' : '' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="sl.active ? 'Activo' : 'Inactivo'"
+                    [colorClass]="getColor(sl.active)"
+                  />
+                </td>
+                @if (auth.isGestor()) {
+                  <td>
+                    <div class="action-btns">
+                      <button
+                        class="action-btn"
+                        (click)="editSupplierLink(sl)"
+                        [attr.aria-label]="'Editar vínculo con ' + sl.supplierName"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        class="action-btn"
+                        (click)="viewCostHistory(sl)"
+                        [attr.aria-label]="'Ver historial de costes de ' + sl.supplierName"
+                      >
+                        Hist. coste
+                      </button>
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  @if (tab() === 'priceHistory') {
+    <div class="card">
+      @if (!priceHistory().length) {
+        <p class="empty-msg">Sin historial de precios.</p>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Anterior</th>
+              <th>Nuevo</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (h of priceHistory(); track h.id) {
+              <tr>
+                <td>{{ h.changedAt | appDateTime }}</td>
+                <td>{{ h.oldBaseSalePrice | appCurrency }}</td>
+                <td class="font-bold">{{ h.newBaseSalePrice | appCurrency }}</td>
+                <td>{{ h.changedByUsername }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  @if (tab() === 'movements') {
+    <div class="card">
+      @if (!movements().length) {
+        <p class="empty-msg">Sin movimientos de stock.</p>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Doc. referencia</th>
+              <th>Motivo</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of movements(); track m.id) {
+              <tr>
+                <td>{{ m.movementDate | appDateTime }}</td>
+                <td>
+                  <span class="movement-type" [class]="'type-' + m.movementType">{{
+                    m.movementType
+                  }}</span>
+                </td>
+                <td [class.positive]="m.quantity > 0" [class.negative]="m.quantity < 0">
+                  {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+                </td>
+                <td class="font-mono text-sm">
+                  {{
+                    m.purchaseOrderId
+                      ? 'Compra #' + m.purchaseOrderId
+                      : m.salesOrderId
+                        ? 'Venta #' + m.salesOrderId
+                        : '—'
+                  }}
+                </td>
+                <td>{{ m.adjustmentReasonName ?? '—' }}</td>
+                <td>{{ m.performedByUsername }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  @if (supplierLinkDialogOpen()) {
+    <div class="dialog-backdrop" (click)="supplierLinkDialogOpen.set(false)">
+      <div
+        class="dialog"
+        role="dialog"
+        [attr.aria-label]="editLinkId() ? 'Editar vínculo proveedor' : 'Vincular proveedor'"
+        (click)="$event.stopPropagation()"
+      >
+        <h3>{{ editLinkId() ? 'Editar vínculo' : 'Vincular proveedor' }}</h3>
+        <form
+          class="form"
+          #supplierLinkForm="ngForm"
+          (ngSubmit)="
+            supplierLinkForm.form.markAllAsTouched(); supplierLinkForm.valid && saveSupplierLink()
+          "
+        >
+          @if (!editLinkId()) {
+            <div class="form-group">
+              <label class="form-label">Proveedor *</label>
+              <select
+                class="form-input"
+                [(ngModel)]="linkForm.supplierId"
+                name="supplierId"
+                required
+              >
+                <option [ngValue]="null" disabled>Seleccionar proveedor...</option>
+                @for (s of allSuppliers(); track s.id) {
+                  <option [ngValue]="s.id">{{ s.name }}</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="form-group">
+            <label class="form-label">Referencia del proveedor</label>
+            <input
+              class="form-input"
+              [(ngModel)]="linkForm.supplierReference"
+              name="supplierReference"
+              maxlength="150"
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Coste base *</label>
+              <input
+                class="form-input"
+                type="number"
+                step="0.01"
+                [(ngModel)]="linkForm.basePurchaseCost"
+                name="basePurchaseCost"
+                #linkCostRef="ngModel"
+                required
+                min="0"
+              />
+              @if (linkCostRef.invalid && linkCostRef.touched) {
+                <small class="form-error">El coste base es obligatorio</small>
+              }
+            </div>
+            <div class="form-group">
+              <label class="form-label">Plazo entrega (días)</label>
+              <input
+                class="form-input"
+                type="number"
+                [(ngModel)]="linkForm.leadTimeDays"
+                name="leadTimeDays"
+                min="0"
+              />
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="linkForm.isPreferredSupplier"
+              name="isPreferredSupplier"
+            />
+            Proveedor preferido
+          </label>
+          <div class="dialog__actions">
+            <button
+              class="btn btn--secondary"
+              type="button"
+              (click)="supplierLinkDialogOpen.set(false)"
+            >
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">
+              {{ editLinkId() ? 'Guardar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (costHistoryDialogOpen()) {
+    <div class="dialog-backdrop" (click)="costHistoryDialogOpen.set(false)">
+      <div
+        class="dialog dialog--wide"
+        role="dialog"
+        aria-label="Historial de costes"
+        (click)="$event.stopPropagation()"
+      >
+        <h3>Historial de costes</h3>
+        @if (!costHistory().length) {
+          <p class="empty-msg">Sin historial de costes.</p>
+        } @else {
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Anterior</th>
+                <th>Nuevo</th>
+                <th>Usuario</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (h of costHistory(); track h.id) {
+                <tr>
+                  <td>{{ h.changedAt | appDateTime }}</td>
+                  <td>{{ h.oldBasePurchaseCost | appCurrency }}</td>
+                  <td class="font-bold">{{ h.newBasePurchaseCost | appCurrency }}</td>
+                  <td>{{ h.changedByUsername }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        <div class="dialog__actions">
+          <button class="btn btn--secondary" (click)="costHistoryDialogOpen.set(false)">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (confirmToggle()) {
+    <app-confirm-dialog
+      [title]="variant()!.active ? 'Desactivar variante' : 'Activar variante'"
+      [message]="variant()!.active ? '¿Desactivar esta variante?' : '¿Activar esta variante?'"
+      [confirmLabel]="variant()!.active ? 'Desactivar' : 'Activar'"
+      [destructive]="variant()!.active"
+      (confirmed)="toggleActive()"
+      (cancelled)="confirmToggle.set(false)"
+    />
+  }
+
+  @if (imageDialogOpen()) {
+    <div class="dialog-backdrop" (click)="imageDialogOpen.set(false)">
+      <div
+        class="dialog"
+        role="dialog"
+        [attr.aria-label]="editImageId() ? 'Editar imagen' : 'Añadir imagen'"
+        (click)="$event.stopPropagation()"
+      >
+        <h3>{{ editImageId() ? 'Editar imagen' : 'Añadir imagen' }}</h3>
+        <form
+          class="form"
+          #variantImageForm="ngForm"
+          (ngSubmit)="
+            variantImageForm.form.markAllAsTouched(); variantImageForm.valid && saveImage()
+          "
+        >
+          @if (!editImageId()) {
+            <div class="form-group">
+              <label class="form-label">Archivo de imagen *</label>
+              <input
+                class="form-input"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                (change)="onFileSelected($event)"
+                name="file"
+              />
+            </div>
+          }
+          @if (imagePreview()) {
+            <div class="form-group">
+              <img
+                [src]="imagePreview()"
+                alt="Vista previa"
+                class="image-thumb"
+                style="max-width: 200px; max-height: 150px; border-radius: 8px"
+              />
+            </div>
+          }
+          <div class="form-group">
+            <label class="form-label">Texto alternativo</label>
+            <input
+              class="form-input"
+              [(ngModel)]="imageForm.altText"
+              name="altText"
+              maxlength="255"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Orden</label>
+            <input
+              class="form-input"
+              type="number"
+              [(ngModel)]="imageForm.displayOrder"
+              name="displayOrder"
+              min="1"
+            />
+          </div>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="imageForm.isPrimary"
+              name="isPrimary"
+              [disabled]="isFirstImage()"
+            />
+            Imagen principal
+            @if (isFirstImage()) {
+              <span class="hint">(primera imagen, se marca automáticamente)</span>
+            }
+          </label>
+          <div class="dialog__actions">
+            <button class="btn btn--secondary" type="button" (click)="imageDialogOpen.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">
+              {{ editImageId() ? 'Guardar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+}

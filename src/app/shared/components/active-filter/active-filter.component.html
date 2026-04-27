@@ -1,0 +1,10 @@
+<select
+  class="filter-select"
+  [ngModel]="value()"
+  (ngModelChange)="valueChange.emit($event)"
+  aria-label="Filtrar por estado activo/inactivo"
+>
+  <option [ngValue]="null">Todos</option>
+  <option [ngValue]="true">Activos</option>
+  <option [ngValue]="false">Inactivos</option>
+</select>

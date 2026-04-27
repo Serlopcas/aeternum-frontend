@@ -1,0 +1,60 @@
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+}
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: #fafaf8;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+}
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.font-mono {
+  font-family: monospace;
+  font-size: 12px;
+}
+.stock-current {
+  color: #c53030;
+  font-weight: 600;
+}
+.stock-diff {
+  color: #c53030;
+  font-weight: 600;
+}
+.link {
+  color: #75482a;
+  font-weight: 500;
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}

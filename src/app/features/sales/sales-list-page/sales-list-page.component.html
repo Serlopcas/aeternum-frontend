@@ -1,0 +1,90 @@
+@if (!clientId) {
+  <app-page-header title="Pedidos de venta" subtitle="Gestión de ventas a clientes">
+    <a routerLink="/sales/basket" class="btn btn--primary" aria-label="Ir a cesta de venta"
+      >+ Nueva venta</a
+    >
+  </app-page-header>
+}
+
+<div class="filters-bar">
+  <select
+    class="filter-select"
+    [ngModel]="statusFilter()"
+    (ngModelChange)="onStatusChange($event)"
+    aria-label="Filtrar por estado"
+  >
+    <option value="">Todos los estados</option>
+    @for (s of statuses(); track s.statusCode) {
+      <option [value]="s.statusCode">{{ s.statusName }}</option>
+    }
+  </select>
+  <app-date-range-filter (rangeChange)="onDateChange($event)" />
+  <div class="page-size-selector">
+    <label class="page-size-label">Filas</label>
+    <select
+      class="filter-select filter-select--sm"
+      [(ngModel)]="pageSize"
+      (ngModelChange)="page.set(0); load()"
+      aria-label="Filas por página"
+    >
+      <option [ngValue]="10">10</option>
+      <option [ngValue]="25">25</option>
+      <option [ngValue]="50">50</option>
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (sales().length === 0) {
+  <app-empty-state icon="🛍️" title="Sin pedidos" message="No se encontraron pedidos de venta." />
+} @else {
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nº Pedido</th>
+          @if (!clientId) {
+            <th>Cliente</th>
+          }
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of sales(); track s.id) {
+          <tr>
+            <td class="font-mono">{{ s.saleNumber }}</td>
+            @if (!clientId) {
+              <td>{{ s.clientName }}</td>
+            }
+            <td>{{ s.documentDate | appDate }}</td>
+            <td>
+              <app-status-badge
+                [label]="s.statusName"
+                [colorClass]="getStatusColor(s.statusCode)"
+              />
+            </td>
+            <td class="font-bold">{{ s.totalAmount | appCurrency }}</td>
+            <td>
+              <a
+                [routerLink]="['/sales', s.id]"
+                class="action-btn"
+                [attr.aria-label]="'Ver pedido ' + s.saleNumber"
+                >Ver</a
+              >
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <app-pagination
+      [currentPage]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="onPageChange($event)"
+    />
+  </div>
+}

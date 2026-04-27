@@ -1,0 +1,265 @@
+<app-page-header title="Productos" subtitle="Catálogo de productos">
+  @if (auth.isGestor()) {
+    <a routerLink="/products/new" class="btn btn--primary" aria-label="Crear nuevo producto"
+      >+ Nuevo producto</a
+    >
+  }
+</app-page-header>
+
+<div class="filters-bar">
+  <div class="view-toggle">
+    <button
+      class="view-btn"
+      [class.active]="view() === 'table'"
+      (click)="setView('table')"
+      aria-label="Ver como tabla"
+    >
+      Tabla
+    </button>
+    <button
+      class="view-btn"
+      [class.active]="view() === 'cards'"
+      (click)="setView('cards')"
+      aria-label="Ver como tarjetas"
+    >
+      Tarjetas
+    </button>
+  </div>
+
+  <app-search-input placeholder="Buscar producto..." (searchChange)="onSearch($event)" />
+
+  <select
+    class="filter-select"
+    [ngModel]="categoryFilter()"
+    (ngModelChange)="onCategoryChange($event)"
+    aria-label="Filtrar por categoría"
+  >
+    <option [ngValue]="undefined">Todas las categorías</option>
+    @for (cat of flatCategories(); track cat.id) {
+      <option [ngValue]="cat.id">{{ cat.label }}</option>
+    }
+  </select>
+
+  <app-active-filter [value]="activeFilter()" (valueChange)="onActiveChange($event)" />
+
+  <label class="filter-checkbox">
+    <input
+      type="checkbox"
+      [ngModel]="separateByCategory()"
+      (ngModelChange)="separateByCategory.set($event)"
+    />
+    Separar por categorías
+  </label>
+
+  <div class="page-size">
+    <label class="form-label" for="productsPageSize">Filas</label>
+    <select
+      id="productsPageSize"
+      class="form-input"
+      [ngModel]="pageSize()"
+      (ngModelChange)="onPageSizeChange($event)"
+      aria-label="Filas por página"
+    >
+      <option [ngValue]="10">10</option>
+      <option [ngValue]="25">25</option>
+      <option [ngValue]="50">50</option>
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (products().length === 0) {
+  <app-empty-state
+    icon="💍"
+    title="Sin productos"
+    message="No se encontraron productos con los filtros actuales."
+  />
+} @else if (view() === 'cards') {
+  <div class="products-cards">
+    @if (separateByCategory()) {
+      @for (group of groupedProducts(); track group.categoryName) {
+        <div class="category-group-header">{{ group.categoryName }}</div>
+        @for (p of group.products; track p.id) {
+          <div
+            class="product-card"
+            [class.product-card--inactive]="!p.active"
+            [routerLink]="['/products', p.id]"
+          >
+            <div class="product-card__code font-mono">{{ p.productCode }}</div>
+            <div class="product-card__name">{{ p.name }}</div>
+            <div class="product-card__category">{{ p.categoryName }}</div>
+            @if (p.brandName) {
+              <div class="product-card__brand">{{ p.brandName }}</div>
+            }
+            <div class="product-card__footer">
+              <app-status-badge
+                [label]="p.active ? 'Activo' : 'Inactivo'"
+                [colorClass]="getActiveColor(p.active)"
+              />
+              @if (auth.isGestor()) {
+                <button
+                  class="action-btn"
+                  (click)="$event.stopPropagation(); askToggle(p)"
+                  [attr.aria-label]="(p.active ? 'Desactivar' : 'Activar') + ' ' + p.name"
+                >
+                  {{ p.active ? 'Desactivar' : 'Activar' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      }
+    } @else {
+      @for (p of products(); track p.id) {
+        <div
+          class="product-card"
+          [class.product-card--inactive]="!p.active"
+          [routerLink]="['/products', p.id]"
+        >
+          <div class="product-card__code font-mono">{{ p.productCode }}</div>
+          <div class="product-card__name">{{ p.name }}</div>
+          <div class="product-card__category">{{ p.categoryName }}</div>
+          @if (p.brandName) {
+            <div class="product-card__brand">{{ p.brandName }}</div>
+          }
+          <div class="product-card__footer">
+            <app-status-badge
+              [label]="p.active ? 'Activo' : 'Inactivo'"
+              [colorClass]="getActiveColor(p.active)"
+            />
+            @if (auth.isGestor()) {
+              <button
+                class="action-btn"
+                (click)="$event.stopPropagation(); askToggle(p)"
+                [attr.aria-label]="(p.active ? 'Desactivar' : 'Activar') + ' ' + p.name"
+              >
+                {{ p.active ? 'Desactivar' : 'Activar' }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+  <app-pagination
+    [currentPage]="page()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (pageChange)="onPageChange($event)"
+  />
+} @else {
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Marca</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (separateByCategory()) {
+          @for (group of groupedProducts(); track group.categoryName) {
+            <tr class="category-separator">
+              <td colspan="6">{{ group.categoryName }}</td>
+            </tr>
+            @for (p of group.products; track p.id) {
+              <tr [class.row--inactive]="!p.active">
+                <td class="font-mono">{{ p.productCode }}</td>
+                <td class="name-cell">{{ p.name }}</td>
+                <td>{{ p.categoryName }}</td>
+                <td>{{ p.brandName ?? '—' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="p.active ? 'Activo' : 'Inactivo'"
+                    [colorClass]="getActiveColor(p.active)"
+                  />
+                </td>
+                <td>
+                  <div class="action-btns">
+                    <a
+                      [routerLink]="['/products', p.id]"
+                      class="action-btn"
+                      [attr.aria-label]="'Ver ' + p.name"
+                      >Ver</a
+                    >
+                    @if (auth.isGestor()) {
+                      <button
+                        class="action-btn"
+                        (click)="askToggle(p)"
+                        [attr.aria-label]="(p.active ? 'Desactivar' : 'Activar') + ' ' + p.name"
+                      >
+                        {{ p.active ? 'Desactivar' : 'Activar' }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        } @else {
+          @for (p of products(); track p.id) {
+            <tr [class.row--inactive]="!p.active">
+              <td class="font-mono">{{ p.productCode }}</td>
+              <td class="name-cell">{{ p.name }}</td>
+              <td>{{ p.categoryName }}</td>
+              <td>{{ p.brandName ?? '—' }}</td>
+              <td>
+                <app-status-badge
+                  [label]="p.active ? 'Activo' : 'Inactivo'"
+                  [colorClass]="getActiveColor(p.active)"
+                />
+              </td>
+              <td>
+                <div class="action-btns">
+                  <a
+                    [routerLink]="['/products', p.id]"
+                    class="action-btn"
+                    [attr.aria-label]="'Ver ' + p.name"
+                    >Ver</a
+                  >
+                  @if (auth.isGestor()) {
+                    <button
+                      class="action-btn"
+                      (click)="askToggle(p)"
+                      [attr.aria-label]="(p.active ? 'Desactivar' : 'Activar') + ' ' + p.name"
+                    >
+                      {{ p.active ? 'Desactivar' : 'Activar' }}
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+
+    <app-pagination
+      [currentPage]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="onPageChange($event)"
+    />
+  </div>
+}
+
+<app-confirm-dialog
+  [open]="confirmItem() !== null"
+  [title]="confirmItem()?.active ? 'Desactivar producto' : 'Activar producto'"
+  [message]="
+    '¿Confirmar ' +
+    (confirmItem()?.active ? 'desactivación' : 'activación') +
+    ' de ' +
+    (confirmItem()?.name ?? '') +
+    '?'
+  "
+  [destructive]="confirmItem()?.active === true"
+  [confirmLabel]="confirmItem()?.active ? 'Desactivar' : 'Activar'"
+  (confirm)="doToggle()"
+  (cancel)="confirmItem.set(null)"
+/>
