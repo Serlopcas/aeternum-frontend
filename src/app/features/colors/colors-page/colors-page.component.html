@@ -1,0 +1,120 @@
+<app-page-header title="Colores" subtitle="Gestión de colores para variantes de productos">
+  @if (auth.isGestor()) {
+    <button class="btn btn--primary" (click)="openCreateDialog()" aria-label="Crear nuevo color">
+      + Nuevo color
+    </button>
+  }
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (colors().length === 0) {
+  <app-empty-state icon="🎨" title="Sin colores" message="No hay colores registrados." />
+} @else {
+  <div class="colors-grid">
+    @for (color of colors(); track color.id) {
+      <div class="color-card">
+        <span
+          class="color-swatch"
+          [style.background-color]="color.colorCode"
+          [attr.aria-label]="color.colorName"
+        ></span>
+        <div class="color-card__info">
+          <span class="color-card__name">{{ color.colorName }}</span>
+          <code class="color-card__code">{{ color.colorCode }}</code>
+        </div>
+        @if (auth.isGestor()) {
+          <div class="color-card__actions">
+            <button
+              class="action-btn"
+              (click)="openEditDialog(color)"
+              [attr.aria-label]="'Editar ' + color.colorName"
+            >
+              Editar
+            </button>
+            <button
+              class="action-btn action-btn--danger"
+              (click)="askDelete(color)"
+              [attr.aria-label]="'Eliminar ' + color.colorName"
+            >
+              Eliminar
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="closeDialog()">
+    <div
+      class="dialog"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      [attr.aria-label]="editing() ? 'Editar color' : 'Nuevo color'"
+    >
+      <h3>{{ editing() ? 'Editar color' : 'Nuevo color' }}</h3>
+      <form
+        class="form"
+        #colorForm="ngForm"
+        (ngSubmit)="colorForm.form.markAllAsTouched(); colorForm.valid && save()"
+      >
+        <div class="form-group">
+          <label class="form-label" for="colorName">Nombre *</label>
+          <input
+            id="colorName"
+            class="form-input"
+            [(ngModel)]="formData.colorName"
+            name="colorName"
+            required
+            maxlength="100"
+            placeholder="Ej: Oro amarillo"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="colorCode">Código de color *</label>
+          <div class="color-input-row">
+            <input
+              type="color"
+              class="color-picker"
+              [(ngModel)]="formData.colorCode"
+              name="colorCodePicker"
+              [attr.aria-label]="'Seleccionar ' + formData.colorName"
+            />
+            <input
+              id="colorCode"
+              class="form-input"
+              [(ngModel)]="formData.colorCode"
+              name="colorCode"
+              required
+              maxlength="7"
+              pattern="^#[0-9A-Fa-f]{6}$"
+              placeholder="#000000"
+            />
+          </div>
+        </div>
+        <div class="dialog__actions">
+          <button class="btn btn--secondary" type="button" (click)="closeDialog()">Cancelar</button>
+          <button class="btn btn--primary" type="submit">
+            {{ editing() ? 'Guardar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<app-confirm-dialog
+  [open]="confirmColor() !== null"
+  title="Eliminar color"
+  [message]="
+    '¿Eliminar el color ' +
+    (confirmColor()?.colorName ?? '') +
+    '? Esta acción no se puede deshacer.'
+  "
+  [destructive]="true"
+  confirmLabel="Eliminar"
+  (confirm)="confirmDelete()"
+  (cancel)="confirmColor.set(null)"
+/>

@@ -1,0 +1,13 @@
+<div class="toast-container">
+  @for (toast of notifications.toasts(); track toast.id) {
+    <div class="toast" [class]="'toast--' + toast.type">
+      <div class="toast__content">
+        <strong>{{ toast.title }}</strong>
+        @if (toast.message) {
+          <p>{{ toast.message }}</p>
+        }
+      </div>
+      <button class="toast__close" (click)="notifications.dismiss(toast.id)">✕</button>
+    </div>
+  }
+</div>

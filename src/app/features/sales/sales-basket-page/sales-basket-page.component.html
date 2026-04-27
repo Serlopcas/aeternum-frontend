@@ -1,0 +1,311 @@
+<app-page-header
+  title="Nueva venta"
+  subtitle="Explora el catálogo de productos vendibles y añade artículos al carrito"
+>
+  <div class="header-actions">
+    @if (basket.lineCount() > 0) {
+      <button class="btn btn--primary" [disabled]="submitting()" (click)="submitOrder()">
+        {{ submitting() ? 'Creando...' : 'Confirmar pedido' }}
+      </button>
+    }
+  </div>
+</app-page-header>
+
+<div class="basket-page">
+  <div class="catalog-panel">
+    <div class="card context-card">
+      <div class="context-row">
+        <div class="form-group">
+          <label class="form-label">Cliente *</label>
+          <select
+            class="form-input"
+            [ngModel]="basket.clientId()"
+            (ngModelChange)="onClientChange($event)"
+            aria-label="Seleccionar cliente"
+          >
+            <option [ngValue]="null">Seleccionar cliente...</option>
+            @for (c of clients(); track c.id) {
+              <option [ngValue]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de pedido</label>
+          <input
+            class="form-input"
+            type="date"
+            max="9999-12-31"
+            [ngModel]="basket.basket().documentDate"
+            (ngModelChange)="basket.setDocumentDate($event)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de entrega</label>
+          <input
+            class="form-input"
+            type="date"
+            max="9999-12-31"
+            [ngModel]="basket.basket().deliveryDate"
+            (ngModelChange)="basket.setDeliveryDate($event)"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas internas</label>
+        <textarea
+          class="form-input"
+          rows="2"
+          [ngModel]="basket.notes()"
+          (ngModelChange)="basket.setNotes($event)"
+          placeholder="Observaciones para el pedido..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="card filters-card">
+      <div class="filters-row">
+        <input
+          class="form-input filter-search"
+          placeholder="Buscar por SKU, nombre..."
+          [(ngModel)]="filterQuery"
+          (input)="onQueryInput()"
+          aria-label="Buscar en catálogo"
+        />
+        <select
+          class="form-input filter-select"
+          [(ngModel)]="filterCategoryId"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filtrar por categoría"
+        >
+          <option [ngValue]="null">Todas las categorías</option>
+          @for (c of categories(); track c.id) {
+            <option [ngValue]="c.id">{{ c.label }}</option>
+          }
+        </select>
+        <select
+          class="form-input filter-small"
+          [(ngModel)]="filterMaterial"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filtrar por material"
+        >
+          <option value="">Material</option>
+          @for (m of materials(); track m) {
+            <option [value]="m">{{ m }}</option>
+          }
+        </select>
+        <select
+          class="form-input filter-small"
+          [(ngModel)]="filterFinish"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filtrar por acabado"
+        >
+          <option value="">Acabado</option>
+          @for (f of finishes(); track f) {
+            <option [value]="f">{{ f }}</option>
+          }
+        </select>
+        <select
+          class="form-input filter-small"
+          [(ngModel)]="filterColor"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filtrar por color"
+        >
+          <option value="">Color</option>
+          @for (c of colors(); track c.id) {
+            <option [value]="c.colorName">{{ c.colorName }}</option>
+          }
+        </select>
+        <label class="filter-check">
+          <input type="checkbox" [(ngModel)]="filterStockOnly" (ngModelChange)="onFilterChange()" />
+          Con stock
+        </label>
+      </div>
+    </div>
+
+    @if (catalogLoading()) {
+      <div class="loading-state">Cargando catálogo...</div>
+    } @else if (catalogPage()?.empty) {
+      <app-empty-state
+        icon="📦"
+        title="Sin resultados"
+        message="No hay productos vendibles con los filtros aplicados."
+      />
+    } @else if (catalogPage()) {
+      <div class="catalog-grid">
+        @for (item of catalogPage()!.content; track item.variantId) {
+          <div
+            class="product-card"
+            [class.in-cart]="isInCart(item.variantId)"
+            [class.out-of-stock]="item.currentStock <= 0"
+          >
+            <div class="product-image">
+              @if (item.primaryImageUrl) {
+                <img [src]="item.primaryImageUrl" [alt]="item.productName" loading="lazy" />
+              } @else {
+                <div class="no-image">📷</div>
+              }
+            </div>
+            <div class="product-body">
+              <div class="product-sku font-mono">{{ item.sku }}</div>
+              <div class="product-name">{{ item.productName }}</div>
+              <div class="product-attrs">
+                @if (item.material) {
+                  <span class="attr-chip">{{ item.material }}</span>
+                }
+                @if (item.finish) {
+                  <span class="attr-chip">{{ item.finish }}</span>
+                }
+                @if (item.color) {
+                  <span class="attr-chip">{{ item.color }}</span>
+                }
+                @if (item.purity) {
+                  <span class="attr-chip">{{ item.purity }}</span>
+                }
+                @if (item.primaryMeasureValue) {
+                  <span class="attr-chip"
+                    >{{ item.primaryMeasureValue }} {{ item.primaryMeasureUnit }}</span
+                  >
+                }
+              </div>
+              <div class="product-price">
+                @if (item.baseSalePrice != null) {
+                  {{ item.baseSalePrice | appCurrency }}
+                } @else {
+                  <span class="no-price">Sin precio</span>
+                }
+              </div>
+              <div
+                class="stock-badge"
+                [class.stock-ok]="item.currentStock > 0"
+                [class.stock-low]="item.isBelowMinimum && item.currentStock > 0"
+                [class.stock-out]="item.currentStock <= 0"
+              >
+                {{ item.currentStock > 0 ? 'Stock: ' + item.currentStock : 'Sin stock' }}
+              </div>
+            </div>
+            <div class="product-footer">
+              @if (item.currentStock <= 0) {
+                <span class="out-of-stock-label">Sin stock</span>
+              } @else if (isInCart(item.variantId)) {
+                <span class="in-cart-label">En carrito ({{ getCartQty(item.variantId) }})</span>
+                <button class="btn-add btn-add--more" (click)="addToCart(item)">+1</button>
+              } @else {
+                <button class="btn-add" (click)="addToCart(item)">Añadir</button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (catalogPage()!.totalPages > 1) {
+        <div class="pagination">
+          <button class="btn btn--ghost" [disabled]="catalogPage()!.first" (click)="prevPage()">
+            ← Anterior
+          </button>
+          <span class="page-info">
+            Pág. {{ catalogPage()!.number + 1 }} / {{ catalogPage()!.totalPages }} ({{
+              catalogPage()!.totalElements
+            }}
+            artículos)
+          </span>
+          <button class="btn btn--ghost" [disabled]="catalogPage()!.last" (click)="nextPage()">
+            Siguiente →
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  <div class="cart-sidebar">
+    <div class="cart-header">
+      <h3>
+        Carrito <span class="cart-count">({{ basket.lineCount() }})</span>
+      </h3>
+      @if (basket.lineCount() > 0) {
+        <button class="btn-icon-danger" (click)="clearConfirm.set(true)" title="Vaciar carrito">
+          🗑
+        </button>
+      }
+    </div>
+
+    @if (basket.lineCount() === 0) {
+      <div class="cart-empty">
+        <span>Añade artículos del catálogo</span>
+      </div>
+    } @else {
+      <div class="cart-lines">
+        @for (line of basket.lines(); track line.localId) {
+          <div class="cart-line" [class.stock-warning]="line.isBelowMinimum">
+            @if (line.imageUrl) {
+              <img class="line-thumb" [src]="line.imageUrl" [alt]="line.sku" />
+            } @else {
+              <div class="line-thumb line-thumb--placeholder">📷</div>
+            }
+            <div class="line-info">
+              <span class="line-sku font-mono">{{ line.sku }}</span>
+              <span class="line-name">{{ line.productName }}</span>
+              @if (line.isBelowMinimum) {
+                <span class="stock-warn-label">⚠ Stock bajo</span>
+              }
+            </div>
+            <div class="line-controls">
+              <input
+                class="qty-input"
+                type="number"
+                min="1"
+                [ngModel]="line.quantitySold"
+                (ngModelChange)="basket.updateLine(line.localId, { quantitySold: +$event })"
+                aria-label="Cantidad"
+              />
+              <span class="line-x">×</span>
+              <input
+                class="price-input"
+                type="number"
+                step="0.01"
+                min="0"
+                [ngModel]="line.unitPriceSnapshot"
+                (ngModelChange)="basket.updateLine(line.localId, { unitPriceSnapshot: +$event })"
+                aria-label="Precio unitario"
+              />
+            </div>
+            <div class="line-subtotal">
+              {{ line.quantitySold * line.unitPriceSnapshot | appCurrency }}
+            </div>
+            <button
+              class="line-remove"
+              (click)="basket.removeLine(line.localId)"
+              [attr.aria-label]="'Eliminar línea ' + line.sku"
+            >
+              ✕
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="cart-totals">
+        <span class="totals-label">Total estimado</span>
+        <span class="totals-value">{{ basket.total() | appCurrency }}</span>
+      </div>
+
+      <div class="cart-actions">
+        <button
+          class="btn btn--primary btn--full"
+          [disabled]="submitting() || !basket.clientId()"
+          (click)="submitOrder()"
+        >
+          {{ submitting() ? 'Creando...' : 'Confirmar pedido' }}
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="clearConfirm()"
+  title="Vaciar carrito"
+  message="¿Seguro que quieres vaciar el carrito de venta?"
+  [destructive]="true"
+  confirmLabel="Vaciar"
+  (confirm)="basket.clear(); clearConfirm.set(false)"
+  (cancel)="clearConfirm.set(false)"
+/>

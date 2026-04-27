@@ -1,0 +1,24 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.page-header__title {
+  margin: 0;
+  font-size: var(--space-7);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+.page-header__subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--space-3-5);
+  color: var(--color-text-muted);
+}
+.page-header__actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}

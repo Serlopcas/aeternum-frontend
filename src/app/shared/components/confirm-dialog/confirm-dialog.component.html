@@ -1,0 +1,25 @@
+@if (open()) {
+  <div class="dialog-backdrop" (click)="cancel.emit()">
+    <div
+      class="dialog"
+      role="dialog"
+      [attr.aria-label]="title()"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 class="dialog__title">{{ title() }}</h3>
+      <p class="dialog__message">{{ message() }}</p>
+      <div class="dialog__actions">
+        <button class="btn btn--secondary" (click)="cancel.emit()" aria-label="Cancelar">
+          Cancelar
+        </button>
+        <button
+          class="btn"
+          [class]="destructive() ? 'btn--danger' : 'btn--primary'"
+          (click)="confirm.emit()"
+        >
+          {{ confirmLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

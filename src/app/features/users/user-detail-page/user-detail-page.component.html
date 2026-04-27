@@ -1,0 +1,141 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (user()) {
+  <app-page-header [title]="user()!.username" subtitle="Detalle del usuario">
+    <a routerLink="/users" class="btn btn--secondary">← Volver</a>
+  </app-page-header>
+
+  <div class="detail-grid">
+    <div class="card info-card">
+      <h4>Información</h4>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">Nombre</span
+          ><span>{{ user()!.firstName }} {{ user()!.lastName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span><span>{{ user()!.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Teléfono</span><span>{{ user()!.phone ?? '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Estado</span>
+          <app-status-badge
+            [label]="user()!.active ? 'Activo' : 'Inactivo'"
+            [colorClass]="getActiveColor(user()!.active)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="card actions-card">
+      <h4>Acciones</h4>
+      <div class="actions-list">
+        @if (user()!.id !== auth.user()?.id) {
+          <button
+            class="btn btn--full"
+            [class.btn--danger]="user()!.active"
+            [class.btn--success]="!user()!.active"
+            (click)="confirmToggle.set(true)"
+            [attr.aria-label]="
+              user()!.active
+                ? 'Desactivar usuario ' + user()!.username
+                : 'Activar usuario ' + user()!.username
+            "
+          >
+            {{ user()!.active ? 'Desactivar usuario' : 'Activar usuario' }}
+          </button>
+        }
+
+        <button
+          class="btn btn--full btn--secondary"
+          (click)="showResetDialog.set(true)"
+          aria-label="Restablecer contraseña del usuario"
+        >
+          Restablecer contraseña
+        </button>
+
+        <div class="role-section">
+          <h5>Roles</h5>
+          @for (r of allRoles(); track r.code) {
+            <label class="role-toggle">
+              <input
+                type="checkbox"
+                [checked]="userRoles().includes(r.code)"
+                (change)="toggleRole(r.code)"
+                [disabled]="user()!.id === auth.user()?.id && r.code === 'GESTOR'"
+              />
+              {{ r.name }}
+            </label>
+          }
+          <button
+            class="btn btn--primary btn--sm"
+            (click)="saveRoles()"
+            [disabled]="!rolesDirty() || userRoles().length === 0"
+          >
+            Guardar roles
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (showResetDialog()) {
+    <div class="dialog-backdrop" (click)="showResetDialog.set(false)">
+      <div
+        class="dialog"
+        role="dialog"
+        aria-label="Restablecer contraseña"
+        (click)="$event.stopPropagation()"
+      >
+        <h3>Restablecer contraseña</h3>
+        <form
+          class="form"
+          #resetPwForm="ngForm"
+          (ngSubmit)="resetPwForm.form.markAllAsTouched(); resetPwForm.valid && resetPassword()"
+        >
+          <div class="form-group">
+            <label class="form-label">Nueva contraseña *</label>
+            <input
+              class="form-input"
+              type="password"
+              [(ngModel)]="newPassword"
+              name="newPassword"
+              #resetPwRef="ngModel"
+              required
+              minlength="8"
+              maxlength="72"
+              autocomplete="new-password"
+            />
+            @if (resetPwRef.invalid && resetPwRef.touched) {
+              @if (resetPwRef.errors?.['required']) {
+                <small class="form-error">La contraseña es obligatoria</small>
+              } @else if (resetPwRef.errors?.['minlength']) {
+                <small class="form-error">Mínimo 8 caracteres</small>
+              }
+            } @else {
+              <small class="form-hint">Mínimo 8 caracteres</small>
+            }
+          </div>
+          <div class="dialog__actions">
+            <button class="btn btn--secondary" type="button" (click)="showResetDialog.set(false)">
+              Cancelar
+            </button>
+            <button class="btn btn--primary" type="submit">Restablecer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <app-confirm-dialog
+    [open]="confirmToggle()"
+    [title]="user()!.active ? 'Desactivar usuario' : 'Activar usuario'"
+    [message]="'¿Confirmar ' + (user()!.active ? 'desactivación' : 'activación') + '?'"
+    [destructive]="user()!.active"
+    [confirmLabel]="user()!.active ? 'Desactivar' : 'Activar'"
+    (confirm)="toggleStatus()"
+    (cancel)="confirmToggle.set(false)"
+  />
+}

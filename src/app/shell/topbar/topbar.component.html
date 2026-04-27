@@ -1,0 +1,44 @@
+<header class="topbar">
+  <div class="topbar__left">
+    <ng-content></ng-content>
+  </div>
+  <div class="topbar__right">
+    <div
+      class="topbar__profile"
+      (click)="menuOpen.set(!menuOpen())"
+      role="button"
+      aria-haspopup="true"
+      [attr.aria-expanded]="menuOpen()"
+      aria-label="Menú de usuario"
+    >
+      <div class="topbar__avatar">
+        @if (auth.user()?.profileImageUrl) {
+          <img [src]="auth.user()!.profileImageUrl!" alt="Avatar" class="topbar__avatar-img" />
+        } @else {
+          {{ initials() }}
+        }
+      </div>
+      <span class="topbar__username">{{ auth.displayName() }}</span>
+      <span class="topbar__caret">▾</span>
+    </div>
+
+    @if (menuOpen()) {
+      <div class="topbar__menu">
+        <a class="topbar__menu-item" routerLink="/profile" (click)="menuOpen.set(false)">
+          👤 Mi perfil
+        </a>
+        <a class="topbar__menu-item" routerLink="/change-password" (click)="menuOpen.set(false)">
+          🔑 Cambiar contraseña
+        </a>
+        <hr class="topbar__menu-divider" />
+        <button
+          class="topbar__menu-item topbar__menu-item--danger"
+          (click)="logout()"
+          aria-label="Cerrar sesión"
+        >
+          🚪 Cerrar sesión
+        </button>
+      </div>
+    }
+  </div>
+</header>

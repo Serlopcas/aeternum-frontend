@@ -1,0 +1,66 @@
+<app-page-header title="Clientes" subtitle="Gestión de clientes">
+  @if (auth.isGestor()) {
+    <a routerLink="/clients/new" class="btn btn--primary">+ Nuevo cliente</a>
+  }
+</app-page-header>
+
+<div class="filters-bar">
+  <app-search-input placeholder="Buscar cliente..." (searchChange)="onSearch($event)" />
+  <app-active-filter [value]="activeFilter()" (valueChange)="onActiveChange($event)" />
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (clients().length === 0) {
+  <app-empty-state
+    icon="🏢"
+    title="Sin clientes"
+    message="No se encontraron clientes con los filtros actuales."
+  />
+} @else {
+  <div class="card">
+    <app-entity-table
+      [columns]="columns"
+      [rows]="clients()"
+      [actions]="actions"
+      (actionClick)="onTableAction($event)"
+    />
+
+    <app-pagination
+      [currentPage]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="onPageChange($event)"
+    />
+  </div>
+}
+
+<app-confirm-dialog
+  [open]="confirmItem() !== null"
+  [title]="confirmItem()?.active ? 'Desactivar cliente' : 'Activar cliente'"
+  [message]="
+    '¿Confirmar ' +
+    (confirmItem()?.active ? 'desactivación' : 'activación') +
+    ' de ' +
+    (confirmItem()?.name ?? '') +
+    '?'
+  "
+  [destructive]="confirmItem()?.active === true"
+  [confirmLabel]="confirmItem()?.active ? 'Desactivar' : 'Activar'"
+  (confirm)="doToggle()"
+  (cancel)="confirmItem.set(null)"
+/>
+
+<app-confirm-dialog
+  [open]="confirmDeleteItem() !== null"
+  title="Eliminar cliente"
+  [message]="
+    '¿Eliminar permanentemente a ' +
+    (confirmDeleteItem()?.name ?? '') +
+    '? Esta acción no se puede deshacer.'
+  "
+  [destructive]="true"
+  confirmLabel="Eliminar"
+  (confirm)="doDelete()"
+  (cancel)="confirmDeleteItem.set(null)"
+/>

@@ -1,0 +1,30 @@
+.filters-bar {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+.card {
+  background: var(--color-bg-surface);
+  border-radius: var(--space-3);
+  padding: 0;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.btn {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--space-2);
+  font-size: var(--space-3-5);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn--primary {
+  background: var(--color-brand-500);
+  color: var(--color-bg-surface);
+}
+.btn--primary:hover {
+  background: var(--color-brand-600);
+}

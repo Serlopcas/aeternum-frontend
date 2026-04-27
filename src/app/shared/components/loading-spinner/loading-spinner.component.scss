@@ -1,0 +1,25 @@
+.spinner-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+}
+.spinner {
+  width: var(--space-10);
+  height: var(--space-10);
+  border: var(--border-width-3) solid var(--color-border-default);
+  border-top-color: var(--color-brand-500);
+  border-radius: var(--size-half);
+  animation: spin var(--motion-duration-spinner) linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spinner-message {
+  margin-top: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--space-3-5);
+}

@@ -1,0 +1,17 @@
+@if (error(); as err) {
+  <div class="error-alert" [class]="'error-alert--' + severity()">
+    <div class="error-alert__icon">⚠</div>
+    <div class="error-alert__content">
+      <p class="error-alert__message">{{ err.message }}</p>
+      @if (err.fieldErrors?.length) {
+        <ul class="error-alert__fields">
+          @for (fe of err.fieldErrors; track fe.field) {
+            <li>
+              <strong>{{ fe.field }}:</strong> {{ fe.message }}
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+}

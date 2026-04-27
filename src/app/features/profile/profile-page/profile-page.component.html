@@ -1,0 +1,123 @@
+<app-page-header title="Mi perfil" subtitle="Consulta y edita tus datos personales" />
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else {
+  <div class="card">
+    <app-api-error-alert [error]="error()" />
+
+    <div class="avatar-section">
+      <div class="avatar-preview">
+        @if (avatarPreview() || user()?.profileImageUrl) {
+          <img
+            [src]="avatarPreview() ?? user()!.profileImageUrl!"
+            alt="Foto de perfil"
+            class="avatar-img"
+          />
+        } @else {
+          <div class="avatar-initials">{{ getInitials() }}</div>
+        }
+      </div>
+      <div class="avatar-actions">
+        <label class="btn btn--secondary btn--sm">
+          {{ user()?.profileImageUrl ? 'Cambiar foto' : 'Subir foto' }}
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            (change)="onAvatarSelected($event)"
+            hidden
+          />
+        </label>
+        @if (user()?.profileImageUrl) {
+          <button class="btn btn--danger btn--sm" type="button" (click)="deleteAvatar()">
+            Eliminar foto
+          </button>
+        }
+      </div>
+    </div>
+
+    <form
+      class="form"
+      #profileForm="ngForm"
+      (ngSubmit)="profileForm.form.markAllAsTouched(); profileForm.valid && onSave()"
+    >
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre *</label>
+          <input
+            class="form-input"
+            [(ngModel)]="firstName"
+            name="firstName"
+            #profFirstRef="ngModel"
+            required
+            maxlength="100"
+          />
+          @if (profFirstRef.invalid && profFirstRef.touched) {
+            <small class="form-error">El nombre es obligatorio</small>
+          }
+        </div>
+        <div class="form-group">
+          <label class="form-label">Apellidos *</label>
+          <input
+            class="form-input"
+            [(ngModel)]="lastName"
+            name="lastName"
+            #profLastRef="ngModel"
+            required
+            maxlength="150"
+          />
+          @if (profLastRef.invalid && profLastRef.touched) {
+            <small class="form-error">Los apellidos son obligatorios</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input
+            class="form-input"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            #profEmailRef="ngModel"
+            required
+            maxlength="150"
+          />
+          @if (profEmailRef.invalid && profEmailRef.touched) {
+            <small class="form-error">El email es obligatorio</small>
+          }
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input class="form-input" [(ngModel)]="phone" name="phone" maxlength="30" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Usuario</label>
+        <input class="form-input" [value]="user()?.username" disabled />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Roles</label>
+        <div class="roles">
+          @for (role of user()?.roles ?? []; track role) {
+            <span class="role-badge">{{ role }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          class="btn btn--primary"
+          type="submit"
+          [disabled]="saving()"
+          aria-label="Guardar cambios del perfil"
+        >
+          {{ saving() ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

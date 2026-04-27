@@ -1,0 +1,8 @@
+<div class="empty-state">
+  <div class="empty-state__icon">{{ icon() }}</div>
+  <h3 class="empty-state__title">{{ title() }}</h3>
+  @if (message(); as msg) {
+    <p class="empty-state__message">{{ msg }}</p>
+  }
+  <ng-content></ng-content>
+</div>

@@ -1,0 +1,208 @@
+<app-page-header title="Variantes" subtitle="Catálogo de variantes de producto">
+  @if (auth.isGestor()) {
+    <button
+      class="btn btn--primary"
+      (click)="openProductSelector()"
+      aria-label="Crear nueva variante"
+    >
+      + Nueva variante
+    </button>
+  }
+</app-page-header>
+
+<div class="filters-bar">
+  <app-search-input (searchChange)="onSearch($event)" placeholder="Buscar por SKU o producto..." />
+
+  <select
+    class="filter-select"
+    [ngModel]="categoryFilter()"
+    (ngModelChange)="onCategoryChange($event)"
+    aria-label="Filtrar por categoría"
+  >
+    <option [ngValue]="undefined">Todas las categorías</option>
+    @for (cat of flatCategories(); track cat.id) {
+      <option [ngValue]="cat.id">{{ cat.label }}</option>
+    }
+  </select>
+
+  <app-active-filter [value]="activeFilter()" (valueChange)="onActiveFilter($event)" />
+
+  <label class="filter-checkbox">
+    <input
+      type="checkbox"
+      [ngModel]="separateByCategory()"
+      (ngModelChange)="separateByCategory.set($event)"
+    />
+    Separar por categorías
+  </label>
+
+  <div class="page-size">
+    <label class="form-label" for="variantsPageSize">Filas</label>
+    <select
+      id="variantsPageSize"
+      class="form-input"
+      [ngModel]="pageSize()"
+      (ngModelChange)="onPageSizeChange($event)"
+      aria-label="Filas por página"
+    >
+      <option [ngValue]="10">10</option>
+      <option [ngValue]="25">25</option>
+      <option [ngValue]="50">50</option>
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (variants().length === 0) {
+  <app-empty-state message="No se encontraron variantes." />
+} @else {
+  <div class="variant-cards">
+    @if (separateByCategory()) {
+      @for (group of groupedVariants(); track group.categoryName) {
+        <div class="category-group-header">{{ group.categoryName }}</div>
+        @for (v of group.variants; track v.id) {
+          <a
+            class="variant-card"
+            [class.variant-card--inactive]="!v.active"
+            [routerLink]="['/products', v.productId, 'variants', v.id]"
+            [queryParams]="{ from: 'variants' }"
+          >
+            <div class="variant-card__image">
+              @if (v.primaryImageUrl) {
+                <img
+                  [src]="v.primaryImageUrl"
+                  [alt]="v.sku"
+                  class="variant-card__img"
+                  (error)="onImageError($event)"
+                />
+              } @else {
+                <div class="variant-card__no-img">Sin imagen</div>
+              }
+            </div>
+            <div class="variant-card__body">
+              <div class="variant-card__sku">{{ v.sku }}</div>
+              <div class="variant-card__product">{{ v.productName }}</div>
+              <div class="variant-card__details">
+                @if (v.material) {
+                  <span class="variant-card__detail">{{ v.material }}</span>
+                }
+                @if (v.color) {
+                  <span class="variant-card__detail">{{ v.color }}</span>
+                }
+                @if (v.finish) {
+                  <span class="variant-card__detail">{{ v.finish }}</span>
+                }
+              </div>
+              <div class="variant-card__footer">
+                <span class="variant-card__price">
+                  {{ v.baseSalePrice != null ? (v.baseSalePrice | number: '1.2-2') + ' €' : '—' }}
+                </span>
+                <app-status-badge
+                  [label]="v.active ? 'Activo' : 'Inactivo'"
+                  [colorClass]="getActiveColor(v.active)"
+                />
+              </div>
+            </div>
+          </a>
+        }
+      }
+    } @else {
+      @for (v of variants(); track v.id) {
+        <a
+          class="variant-card"
+          [class.variant-card--inactive]="!v.active"
+          [routerLink]="['/products', v.productId, 'variants', v.id]"
+          [queryParams]="{ from: 'variants' }"
+        >
+          <div class="variant-card__image">
+            @if (v.primaryImageUrl) {
+              <img
+                [src]="v.primaryImageUrl"
+                [alt]="v.sku"
+                class="variant-card__img"
+                (error)="onImageError($event)"
+              />
+            } @else {
+              <div class="variant-card__no-img">Sin imagen</div>
+            }
+          </div>
+          <div class="variant-card__body">
+            <div class="variant-card__sku">{{ v.sku }}</div>
+            <div class="variant-card__product">{{ v.productName }}</div>
+            <div class="variant-card__details">
+              @if (v.material) {
+                <span class="variant-card__detail">{{ v.material }}</span>
+              }
+              @if (v.color) {
+                <span class="variant-card__detail">{{ v.color }}</span>
+              }
+              @if (v.finish) {
+                <span class="variant-card__detail">{{ v.finish }}</span>
+              }
+            </div>
+            <div class="variant-card__footer">
+              <span class="variant-card__price">
+                {{ v.baseSalePrice != null ? (v.baseSalePrice | number: '1.2-2') + ' €' : '—' }}
+              </span>
+              <app-status-badge
+                [label]="v.active ? 'Activo' : 'Inactivo'"
+                [colorClass]="getActiveColor(v.active)"
+              />
+            </div>
+          </div>
+        </a>
+      }
+    }
+  </div>
+
+  <app-pagination
+    [currentPage]="page()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (pageChange)="onPageChange($event)"
+  />
+}
+
+@if (productSelectorOpen()) {
+  <div class="dialog-backdrop" (click)="productSelectorOpen.set(false)">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <h3 class="dialog__title">Selecciona un producto</h3>
+      <div class="dialog__search">
+        <app-search-input
+          [placeholder]="'Buscar producto...'"
+          [debounceMs]="600"
+          (searchChange)="onProductSearch($event)"
+        />
+      </div>
+      <div class="dialog__filters">
+        <select
+          class="filter-select"
+          [ngModel]="productSelectorCategory()"
+          (ngModelChange)="onProductSelectorCategoryChange($event)"
+          aria-label="Filtrar por categoría"
+        >
+          <option [ngValue]="undefined">Todas las categorías</option>
+          @for (cat of flatCategories(); track cat.id) {
+            <option [ngValue]="cat.id">{{ cat.label }}</option>
+          }
+        </select>
+      </div>
+      <ul class="product-select-list">
+        @for (p of productList(); track p.id) {
+          <li class="product-select-item" (click)="selectProduct(p)">
+            <strong>{{ p.name }}</strong>
+            <span class="product-select-item__code">{{ p.productCode }}</span>
+          </li>
+        } @empty {
+          <li class="product-select-item product-select-item--empty">Sin resultados</li>
+        }
+      </ul>
+      <div class="dialog__actions">
+        <button class="btn btn--secondary" (click)="productSelectorOpen.set(false)">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+}

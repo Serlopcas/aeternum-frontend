@@ -1,0 +1,27 @@
+.date-range {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+.date-range__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.date-range__label {
+  font-size: var(--space-3);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+.date-range__input {
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-1) solid var(--color-border-strong);
+  border-radius: var(--space-2);
+  font-size: var(--space-3-5);
+  outline: none;
+  background: var(--color-bg-surface);
+}
+.date-range__input:focus {
+  border-color: var(--color-brand-500);
+  box-shadow: var(--shadow-focus-brand);
+}

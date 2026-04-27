@@ -1,0 +1,91 @@
+@if (!supplierId) {
+  <app-page-header title="Pedidos de compra" subtitle="Gestión de compras a proveedores">
+    <a routerLink="/purchases/basket" class="btn btn--primary" aria-label="Ir a cesta de compra"
+      >+ Nueva compra</a
+    >
+  </app-page-header>
+}
+
+<div class="filters-bar">
+  <select
+    class="filter-select"
+    [ngModel]="statusFilter()"
+    (ngModelChange)="onStatusChange($event)"
+    aria-label="Filtrar por estado"
+  >
+    <option value="">Todos los estados</option>
+    @for (s of statuses(); track s.statusCode) {
+      <option [value]="s.statusCode">{{ s.statusName }}</option>
+    }
+  </select>
+  <app-date-range-filter (rangeChange)="onDateChange($event)" />
+  <div class="page-size-selector">
+    <label class="page-size-label">Filas</label>
+    <select
+      class="filter-select filter-select--sm"
+      [(ngModel)]="pageSize"
+      (ngModelChange)="page.set(0); load()"
+      aria-label="Filas por página"
+    >
+      <option [ngValue]="10">10</option>
+      <option [ngValue]="25">25</option>
+      <option [ngValue]="50">50</option>
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (purchases().length === 0) {
+  <app-empty-state icon="📦" title="Sin pedidos" message="No se encontraron pedidos de compra." />
+} @else {
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nº Pedido</th>
+          @if (!supplierId) {
+            <th>Proveedor</th>
+          }
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of purchases(); track p.id) {
+          <tr>
+            <td class="font-mono">{{ p.purchaseNumber }}</td>
+            @if (!supplierId) {
+              <td>{{ p.supplierName }}</td>
+            }
+            <td>{{ p.documentDate | appDate }}</td>
+            <td>
+              <app-status-badge
+                [label]="p.statusName"
+                [colorClass]="getStatusColor(p.statusCode)"
+              />
+            </td>
+            <td class="font-bold">{{ p.totalAmount | appCurrency }}</td>
+            <td>
+              <a
+                [routerLink]="['/purchases', p.id]"
+                class="action-btn"
+                [attr.aria-label]="'Ver pedido ' + p.purchaseNumber"
+                >Ver</a
+              >
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <app-pagination
+      [currentPage]="page()"
+      [totalPages]="totalPages()"
+      [totalElements]="totalElements()"
+      (pageChange)="onPageChange($event)"
+    />
+  </div>
+}

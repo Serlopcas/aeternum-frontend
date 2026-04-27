@@ -1,0 +1,352 @@
+<app-page-header
+  title="Nueva compra"
+  subtitle="Selecciona un proveedor, filtra el catálogo y añade artículos al carrito"
+>
+  <div class="header-actions">
+    @if (basket.lineCount() > 0) {
+      <button class="btn btn--secondary" (click)="saveDraft()">Guardar borrador</button>
+      <button class="btn btn--primary" [disabled]="submitting()" (click)="submitOrder()">
+        {{ submitting() ? 'Creando...' : 'Confirmar pedido' }}
+      </button>
+    }
+  </div>
+</app-page-header>
+@if (drafts().length > 0) {
+  <div class="drafts-banner">
+    <button class="drafts-toggle" (click)="showDrafts.update((v) => !v)">
+      <span>📋 Borradores guardados ({{ drafts().length }})</span>
+      <span class="chevron">{{ showDrafts() ? '▲' : '▼' }}</span>
+    </button>
+    @if (showDrafts()) {
+      <div class="drafts-list">
+        @for (draft of drafts(); track draft.supplierId) {
+          <div class="draft-item" (click)="loadDraft(draft)">
+            <div class="draft-info">
+              <span class="draft-supplier">{{ draft.supplierName }}</span>
+              <span class="draft-meta"
+                >{{ draft.lineCount }} líneas · {{ draft.unitTotal | appCurrency }}</span
+              >
+            </div>
+            <button
+              class="draft-delete"
+              (click)="deleteDraft(draft, $event)"
+              aria-label="Eliminar borrador"
+            >
+              ✕
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+<div class="basket-page">
+  <div class="catalog-panel">
+    <div class="card context-card">
+      <div class="context-row">
+        <div class="form-group">
+          <label class="form-label">Proveedor *</label>
+          <select
+            class="form-input"
+            [ngModel]="basket.activeSupplierId()"
+            (ngModelChange)="onSupplierChange($event)"
+            aria-label="Seleccionar proveedor"
+          >
+            <option [ngValue]="null">Seleccionar proveedor...</option>
+            @for (s of suppliers(); track s.id) {
+              <option [ngValue]="s.id">{{ s.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de pedido</label>
+          <input
+            class="form-input"
+            type="date"
+            max="9999-12-31"
+            [ngModel]="basket.basket().documentDate"
+            (ngModelChange)="basket.setDocumentDate($event)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Entrega prevista</label>
+          <input
+            class="form-input"
+            type="date"
+            max="9999-12-31"
+            [ngModel]="basket.basket().expectedDeliveryDate"
+            (ngModelChange)="basket.setExpectedDeliveryDate($event)"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas internas</label>
+        <textarea
+          class="form-input"
+          rows="2"
+          [ngModel]="basket.notes()"
+          (ngModelChange)="basket.setNotes($event)"
+          placeholder="Observaciones para el pedido..."
+        ></textarea>
+      </div>
+    </div>
+
+    @if (basket.activeSupplierId()) {
+      <div class="card filters-card">
+        <div class="filters-row">
+          <input
+            class="form-input filter-search"
+            placeholder="Buscar por SKU, nombre, referencia..."
+            [(ngModel)]="filterQuery"
+            (input)="onQueryInput()"
+            aria-label="Buscar en catálogo"
+          />
+          <select
+            class="form-input filter-select"
+            [(ngModel)]="filterCategoryId"
+            (ngModelChange)="onFilterChange()"
+            aria-label="Filtrar por categoría"
+          >
+            <option [ngValue]="null">Todas las categorías</option>
+            @for (c of categories(); track c.id) {
+              <option [ngValue]="c.id">{{ c.label }}</option>
+            }
+          </select>
+          <select
+            class="form-input filter-small"
+            [(ngModel)]="filterMaterial"
+            (ngModelChange)="onFilterChange()"
+            aria-label="Filtrar por material"
+          >
+            <option value="">Material</option>
+            @for (m of materials(); track m) {
+              <option [value]="m">{{ m }}</option>
+            }
+          </select>
+          <select
+            class="form-input filter-small"
+            [(ngModel)]="filterFinish"
+            (ngModelChange)="onFilterChange()"
+            aria-label="Filtrar por acabado"
+          >
+            <option value="">Acabado</option>
+            @for (f of finishes(); track f) {
+              <option [value]="f">{{ f }}</option>
+            }
+          </select>
+          <select
+            class="form-input filter-small"
+            [(ngModel)]="filterColor"
+            (ngModelChange)="onFilterChange()"
+            aria-label="Filtrar por color"
+          >
+            <option value="">Color</option>
+            @for (c of colors(); track c.id) {
+              <option [value]="c.colorName">{{ c.colorName }}</option>
+            }
+          </select>
+          <label class="filter-check">
+            <input
+              type="checkbox"
+              [(ngModel)]="filterPreferredOnly"
+              (ngModelChange)="onFilterChange()"
+            />
+            Solo preferidos
+          </label>
+        </div>
+      </div>
+
+      @if (catalogLoading()) {
+        <div class="loading-state">Cargando catálogo...</div>
+      } @else if (catalogPage()?.empty) {
+        <app-empty-state
+          icon="📦"
+          title="Sin resultados"
+          message="No hay productos para este proveedor con los filtros aplicados."
+        />
+      } @else if (catalogPage()) {
+        <div class="catalog-grid">
+          @for (item of catalogPage()!.content; track item.variantId) {
+            <div class="product-card" [class.in-cart]="isInCart(item.variantId)">
+              <div class="product-image">
+                @if (item.primaryImageUrl) {
+                  <img [src]="item.primaryImageUrl" [alt]="item.productName" loading="lazy" />
+                } @else {
+                  <div class="no-image">📷</div>
+                }
+              </div>
+              <div class="product-body">
+                <div class="product-sku font-mono">{{ item.sku }}</div>
+                <div class="product-name">{{ item.productName }}</div>
+                <div class="product-attrs">
+                  @if (item.material) {
+                    <span class="attr-chip">{{ item.material }}</span>
+                  }
+                  @if (item.finish) {
+                    <span class="attr-chip">{{ item.finish }}</span>
+                  }
+                  @if (item.color) {
+                    <span class="attr-chip">{{ item.color }}</span>
+                  }
+                  @if (item.purity) {
+                    <span class="attr-chip">{{ item.purity }}</span>
+                  }
+                  @if (item.primaryMeasureValue) {
+                    <span class="attr-chip"
+                      >{{ item.primaryMeasureValue }} {{ item.primaryMeasureUnit }}</span
+                    >
+                  }
+                </div>
+                <div class="product-cost">
+                  @if (item.basePurchaseCost != null) {
+                    {{ item.basePurchaseCost | appCurrency }}
+                  } @else {
+                    <span class="no-cost">Sin precio</span>
+                  }
+                  @if (item.preferredSupplier) {
+                    <span class="preferred-badge">★ Preferido</span>
+                  }
+                </div>
+              </div>
+              <div class="product-footer">
+                @if (isInCart(item.variantId)) {
+                  <span class="in-cart-label">En carrito ({{ getCartQty(item.variantId) }})</span>
+                  <button class="btn-add btn-add--more" (click)="addToCart(item)">+1</button>
+                } @else {
+                  <button class="btn-add" (click)="addToCart(item)">Añadir</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (catalogPage()!.totalPages > 1) {
+          <div class="pagination">
+            <button class="btn btn--ghost" [disabled]="catalogPage()!.first" (click)="prevPage()">
+              ← Anterior
+            </button>
+            <span class="page-info">
+              Pág. {{ catalogPage()!.number + 1 }} / {{ catalogPage()!.totalPages }} ({{
+                catalogPage()!.totalElements
+              }}
+              artículos)
+            </span>
+            <button class="btn btn--ghost" [disabled]="catalogPage()!.last" (click)="nextPage()">
+              Siguiente →
+            </button>
+          </div>
+        }
+      } @else {
+        <app-empty-state
+          icon="🏪"
+          title="Catálogo no cargado"
+          message="Selecciona un proveedor para ver sus productos."
+        />
+      }
+    } @else {
+      <app-empty-state
+        icon="🏪"
+        title="Selecciona un proveedor"
+        message="Elige un proveedor para explorar su catálogo de productos."
+      />
+    }
+  </div>
+
+  <div class="cart-sidebar">
+    <div class="cart-header">
+      <h3>
+        Carrito <span class="cart-count">({{ basket.lineCount() }})</span>
+      </h3>
+      @if (basket.lineCount() > 0) {
+        <button class="btn-icon-danger" (click)="clearConfirm.set(true)" title="Vaciar carrito">
+          🗑
+        </button>
+      }
+    </div>
+
+    @if (basket.lineCount() === 0) {
+      <div class="cart-empty">
+        <span>Añade artículos del catálogo</span>
+      </div>
+    } @else {
+      <div class="cart-lines">
+        @for (line of basket.lines(); track line.localId) {
+          <div
+            class="cart-line"
+            [class.validation-error]="line.validationStatus && line.validationStatus !== 'VALID'"
+          >
+            @if (line.imageUrl) {
+              <img class="line-thumb" [src]="line.imageUrl" [alt]="line.sku" />
+            } @else {
+              <div class="line-thumb line-thumb--placeholder">📷</div>
+            }
+            <div class="line-info">
+              <span class="line-sku font-mono">{{ line.sku }}</span>
+              <span class="line-name">{{ line.productName }}</span>
+              @if (line.supplierReference) {
+                <span class="line-ref">Ref: {{ line.supplierReference }}</span>
+              }
+            </div>
+            <div class="line-controls">
+              <input
+                class="qty-input"
+                type="number"
+                min="1"
+                [ngModel]="line.quantityOrdered"
+                (ngModelChange)="basket.updateLine(line.localId, { quantityOrdered: +$event })"
+                aria-label="Cantidad"
+              />
+              <span class="line-x">×</span>
+              <input
+                class="cost-input"
+                type="number"
+                step="0.01"
+                min="0"
+                [ngModel]="line.unitCostSnapshot"
+                (ngModelChange)="basket.updateLine(line.localId, { unitCostSnapshot: +$event })"
+                aria-label="Coste unitario"
+              />
+            </div>
+            <div class="line-subtotal">
+              {{ line.quantityOrdered * line.unitCostSnapshot | appCurrency }}
+            </div>
+            <button
+              class="line-remove"
+              (click)="basket.removeLine(line.localId)"
+              [attr.aria-label]="'Eliminar línea ' + line.sku"
+            >
+              ✕
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="cart-totals">
+        <span class="totals-label">Total estimado</span>
+        <span class="totals-value">{{ basket.total() | appCurrency }}</span>
+      </div>
+
+      <div class="cart-actions">
+        <button class="btn btn--secondary btn--full" (click)="saveDraft()">Guardar borrador</button>
+        <button
+          class="btn btn--primary btn--full"
+          [disabled]="submitting() || !basket.supplierId()"
+          (click)="submitOrder()"
+        >
+          {{ submitting() ? 'Creando...' : 'Confirmar pedido' }}
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="clearConfirm()"
+  title="Vaciar carrito"
+  message="¿Seguro que quieres vaciar el carrito de este proveedor?"
+  [destructive]="true"
+  confirmLabel="Vaciar"
+  (confirm)="basket.clear(); clearConfirm.set(false)"
+  (cancel)="clearConfirm.set(false)"
+/>

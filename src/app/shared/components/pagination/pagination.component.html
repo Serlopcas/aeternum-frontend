@@ -1,0 +1,42 @@
+<div class="pagination">
+  <span class="pagination__info">
+    {{ totalElements() }} resultado{{ totalElements() !== 1 ? 's' : '' }}
+  </span>
+  <div class="pagination__controls">
+    <button
+      class="pagination__btn"
+      [disabled]="currentPage() === 0"
+      (click)="pageChange.emit(0)"
+      aria-label="Primera página"
+    >
+      ««
+    </button>
+    <button
+      class="pagination__btn"
+      [disabled]="currentPage() === 0"
+      (click)="pageChange.emit(currentPage() - 1)"
+      aria-label="Página anterior"
+    >
+      «
+    </button>
+    <span class="pagination__current" aria-live="polite">
+      {{ currentPage() + 1 }} / {{ totalPages() || 1 }}
+    </span>
+    <button
+      class="pagination__btn"
+      [disabled]="currentPage() >= totalPages() - 1"
+      (click)="pageChange.emit(currentPage() + 1)"
+      aria-label="Página siguiente"
+    >
+      »
+    </button>
+    <button
+      class="pagination__btn"
+      [disabled]="currentPage() >= totalPages() - 1"
+      (click)="pageChange.emit(totalPages() - 1)"
+      aria-label="Última página"
+    >
+      »»
+    </button>
+  </div>
+</div>

@@ -1,0 +1,95 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--space-16);
+  padding: 0 var(--space-6);
+  background: var(--color-bg-surface);
+  border-bottom: var(--border-width-1) solid var(--color-border-default);
+}
+.topbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.topbar__right {
+  position: relative;
+}
+.topbar__profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  cursor: pointer;
+  padding: var(--space-1-5) var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background var(--motion-duration-base);
+}
+.topbar__profile:hover {
+  background: var(--color-bg-subtle);
+}
+.topbar__avatar {
+  width: var(--space-9);
+  height: var(--space-9);
+  border-radius: var(--radius-circle);
+  background: var(--color-brand-500);
+  color: var(--color-bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--space-3-5);
+  font-weight: var(--font-weight-semibold);
+}
+.topbar__avatar-img {
+  width: var(--size-full);
+  height: var(--size-full);
+  object-fit: cover;
+  border-radius: var(--radius-circle);
+}
+.topbar__username {
+  font-size: var(--space-3-5);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.topbar__caret {
+  font-size: var(--space-3);
+  color: var(--color-text-faint);
+}
+.topbar__menu {
+  position: absolute;
+  right: 0;
+  top: var(--space-13);
+  background: var(--color-bg-surface);
+  border: var(--border-width-1) solid var(--color-border-default);
+  border-radius: var(--space-2-5);
+  box-shadow: var(--shadow-lg-soft);
+  min-width: var(--size-200);
+  padding: var(--space-1-5);
+  z-index: var(--z-dropdown);
+}
+.topbar__menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2-5) var(--space-3-5);
+  border: none;
+  background: transparent;
+  width: var(--size-full);
+  text-align: left;
+  text-decoration: none;
+  font-size: var(--space-3-5);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--motion-duration-fast);
+}
+.topbar__menu-item:hover {
+  background: var(--color-bg-subtle);
+}
+.topbar__menu-item--danger {
+  color: var(--color-danger-600);
+}
+.topbar__menu-divider {
+  border: none;
+  border-top: var(--border-width-1) solid var(--color-border-default);
+  margin: var(--space-1) 0;
+}

@@ -1,0 +1,317 @@
+<app-page-header title="Categorías" subtitle="Gestión del árbol de categorías">
+  @if (auth.isGestor()) {
+    <button
+      class="btn btn--primary"
+      (click)="openCreateDialog()"
+      aria-label="Crear nueva categoría"
+    >
+      + Nueva categoría
+    </button>
+  }
+</app-page-header>
+
+<div class="filters-bar">
+  <div class="view-toggle">
+    <button
+      class="view-btn"
+      [class.active]="view() === 'table'"
+      (click)="setView('table')"
+      aria-label="Ver como tabla"
+    >
+      Tabla
+    </button>
+    <button
+      class="view-btn"
+      [class.active]="view() === 'tree'"
+      (click)="setView('tree')"
+      aria-label="Ver como árbol"
+    >
+      Árbol
+    </button>
+  </div>
+  @if (view() === 'table') {
+    <app-search-input placeholder="Buscar categoría..." (searchChange)="onSearch($event)" />
+    <app-active-filter [value]="activeFilter()" (valueChange)="onActiveChange($event)" />
+    <div class="page-size">
+      <label class="form-label" for="catPageSize">Filas</label>
+      <select
+        id="catPageSize"
+        class="form-input"
+        [ngModel]="pageSize()"
+        (ngModelChange)="onPageSizeChange($event)"
+        aria-label="Filas por página"
+      >
+        <option [ngValue]="10">10</option>
+        <option [ngValue]="25">25</option>
+        <option [ngValue]="50">50</option>
+      </select>
+    </div>
+  }
+</div>
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (view() === 'tree') {
+  <div class="card">
+    @if (tree().length === 0) {
+      <app-empty-state icon="🗂️" title="Sin categorías" message="No hay categorías creadas." />
+    } @else {
+      <div class="tree">
+        @for (node of tree(); track node.id) {
+          <ng-template
+            [ngTemplateOutlet]="treeNode"
+            [ngTemplateOutletContext]="{ node, depth: 0 }"
+          ></ng-template>
+        }
+      </div>
+    }
+  </div>
+
+  <ng-template #treeNode let-node="node" let-depth="depth">
+    <div class="tree-item" [style.paddingLeft.px]="16 + depth * 24">
+      <span class="tree-icon">{{ depth === 0 || node.children?.length > 0 ? '📁' : '📄' }}</span>
+      <span class="tree-name" [class.inactive]="!node.active"
+        >{{ node.name }}
+        <span class="cat-code">{{ node.categoryCode }}</span>
+      </span>
+      <span class="tree-status">
+        <app-status-badge
+          [label]="node.active ? 'Activo' : 'Inactivo'"
+          [colorClass]="getActiveColor(node.active)"
+        />
+      </span>
+      @if (auth.isGestor()) {
+        <div class="tree-actions">
+          <button
+            class="action-btn"
+            (click)="toggleStatus(node)"
+            [attr.aria-label]="(node.active ? 'Desactivar' : 'Activar') + ' ' + node.name"
+          >
+            {{ node.active ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button
+            class="action-btn"
+            (click)="openCreateDialog(node.id)"
+            [attr.aria-label]="'Añadir subcategoría a ' + node.name"
+          >
+            Añadir Subcategoría
+          </button>
+          <button
+            class="action-btn"
+            (click)="openEditDialog(node)"
+            [attr.aria-label]="'Editar ' + node.name"
+          >
+            Editar
+          </button>
+          <button
+            class="action-btn"
+            (click)="deleteCategory(node.id)"
+            [attr.aria-label]="'Borrar ' + node.name"
+          >
+            Borrar
+          </button>
+        </div>
+      }
+    </div>
+    @if (node.children) {
+      @for (child of node.children; track child.id) {
+        <ng-template
+          [ngTemplateOutlet]="treeNode"
+          [ngTemplateOutletContext]="{ node: child, depth: depth + 1 }"
+        ></ng-template>
+      }
+    }
+  </ng-template>
+} @else {
+  @if (categories().length === 0) {
+    <app-empty-state
+      icon="🗂️"
+      title="Sin categorías"
+      message="No se encontraron categorías con los filtros actuales."
+    />
+  } @else {
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Ruta</th>
+            <th>Estado</th>
+            @if (auth.isGestor()) {
+              <th class="col-actions">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (cat of categories(); track cat.id) {
+            <tr [class.row--inactive]="!cat.active">
+              <td>
+                <div class="name-with-code">
+                  <div class="name">{{ cat.name }}</div>
+                  <div class="code">{{ cat.categoryCode }}</div>
+                </div>
+              </td>
+              <td class="path-cell" [title]="getCategoryPath(cat)">
+                {{ getCategoryPath(cat) || '—' }}
+              </td>
+              <td>
+                <app-status-badge
+                  [label]="cat.active ? 'Activo' : 'Inactivo'"
+                  [colorClass]="getActiveColor(cat.active)"
+                />
+              </td>
+              @if (auth.isGestor()) {
+                <td>
+                  <div class="action-btns">
+                    <button
+                      class="action-btn"
+                      (click)="toggleStatus(cat)"
+                      [attr.aria-label]="(cat.active ? 'Desactivar' : 'Activar') + ' ' + cat.name"
+                    >
+                      {{ cat.active ? 'Desactivar' : 'Activar' }}
+                    </button>
+                    <button
+                      class="action-btn"
+                      (click)="openEditDialog(cat)"
+                      [attr.aria-label]="'Editar ' + cat.name"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      class="action-btn"
+                      (click)="deleteCategory(cat.id)"
+                      [attr.aria-label]="'Borrar ' + cat.name"
+                    >
+                      Borrar
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <app-pagination
+        [currentPage]="page()"
+        [totalPages]="totalPages()"
+        [totalElements]="totalElements()"
+        (pageChange)="onPageChange($event)"
+      />
+    </div>
+  }
+}
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="closeDialog()">
+    <div
+      class="dialog"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      [attr.aria-label]="editing() ? 'Editar categoría' : 'Nueva categoría'"
+    >
+      <h3>{{ editing() ? 'Editar categoría' : 'Nueva categoría' }}</h3>
+      <form
+        class="form"
+        #catForm="ngForm"
+        (ngSubmit)="catForm.form.markAllAsTouched(); catForm.valid && saveCategory()"
+      >
+        <div class="form-group">
+          <label class="form-label">Nombre *</label>
+          <input
+            class="form-input"
+            [(ngModel)]="formData.name"
+            (ngModelChange)="onNameChange($event)"
+            name="name"
+            #catName="ngModel"
+            required
+            maxlength="100"
+          />
+          @if (catName.invalid && catName.touched) {
+            <small class="form-error">El nombre es obligatorio</small>
+          }
+        </div>
+        <div class="form-group">
+          <label class="form-label">Código</label>
+          <input
+            class="form-input"
+            [(ngModel)]="formData.categoryCode"
+            (ngModelChange)="onCodeInputChange($event)"
+            name="categoryCode"
+            maxlength="30"
+            placeholder="Dejar vacío para generar automáticamente"
+            [disabled]="!canEditCode()"
+          />
+          @if (codeLoading()) {
+            <span class="small-muted">Generando…</span>
+          }
+          @if (
+            !codeLoading() &&
+            suggestedCode() &&
+            (userTouchedCode || (codeEdited && suggestedCode() !== originalCategoryCode))
+          ) {
+            <div class="small-muted">
+              Sugerido: <span class="suggest-kbd">{{ suggestedCode() }}</span>
+              <button
+                type="button"
+                class="p-button-text p-ml-2 p-p-0"
+                (click)="applySuggested()"
+                aria-label="Aplicar código sugerido"
+              >
+                Aplicar
+              </button>
+            </div>
+          }
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoría superior (opcional)</label>
+          <select
+            class="form-input"
+            [(ngModel)]="formData.parentId"
+            (ngModelChange)="onParentChange($event)"
+            name="parentId"
+            [disabled]="codeLoading() || parentLocked"
+          >
+            <option [ngValue]="null">— Sin categoría superior —</option>
+            @for (cat of allCategories(); track cat.id) {
+              @if (!editing() || cat.id !== editId()) {
+                <option [ngValue]="cat.id">{{ cat.name }}</option>
+              }
+            }
+          </select>
+        </div>
+        <div class="dialog__actions">
+          <button class="btn btn--secondary" type="button" (click)="closeDialog()">Cancelar</button>
+          <button class="btn btn--primary" type="submit" [disabled]="codeLoading()">
+            {{ editing() ? 'Guardar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<app-confirm-dialog
+  [open]="confirmCat() !== null"
+  [title]="confirmCat()?.active ? 'Desactivar categoría' : 'Activar categoría'"
+  [message]="
+    '¿Confirmar ' +
+    (confirmCat()?.active ? 'desactivación' : 'activación') +
+    ' de ' +
+    (confirmCat()?.name ?? '') +
+    '?'
+  "
+  [destructive]="confirmCat()?.active === true"
+  [confirmLabel]="confirmCat()?.active ? 'Desactivar' : 'Activar'"
+  (confirm)="confirmToggle()"
+  (cancel)="confirmCat.set(null)"
+/>
+<app-confirm-dialog
+  [open]="confirmDelete() !== null"
+  [title]="'Borrar categoría'"
+  [message]="'¿Confirmar borrado de la categoría? Esta acción no se puede deshacer.'"
+  [destructive]="true"
+  [confirmLabel]="'Borrar'"
+  (confirm)="confirmDeleteAction()"
+  (cancel)="confirmDelete.set(null)"
+/>
