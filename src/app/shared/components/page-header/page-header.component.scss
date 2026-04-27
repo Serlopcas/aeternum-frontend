@@ -2,23 +2,23 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 24px;
-  gap: 16px;
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
   flex-wrap: wrap;
 }
 .page-header__title {
   margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1f2933;
+  font-size: var(--space-7);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
 }
 .page-header__subtitle {
-  margin: 4px 0 0;
-  font-size: 14px;
-  color: #6b7280;
+  margin: var(--space-1) 0 0;
+  font-size: var(--space-3-5);
+  color: var(--color-text-muted);
 }
 .page-header__actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   align-items: center;
 }

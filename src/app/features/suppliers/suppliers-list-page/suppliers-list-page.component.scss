@@ -1,30 +1,30 @@
 .filters-bar {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
   flex-wrap: wrap;
 }
 .card {
-  background: #fff;
-  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--space-3);
   padding: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 .btn {
-  padding: 8px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--space-2);
+  font-size: var(--space-3-5);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   border: none;
   text-decoration: none;
   display: inline-block;
 }
 .btn--primary {
-  background: #75482a;
-  color: #fff;
+  background: var(--color-brand-500);
+  color: var(--color-bg-surface);
 }
 .btn--primary:hover {
-  background: #5e3a22;
+  background: var(--color-brand-600);
 }

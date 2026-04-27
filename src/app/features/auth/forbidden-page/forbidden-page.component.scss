@@ -1,32 +1,32 @@
 .forbidden {
   text-align: center;
-  padding: 80px 24px;
+  padding: var(--space-20) var(--space-6);
 }
 .forbidden__icon {
-  font-size: 64px;
-  margin-bottom: 16px;
+  font-size: var(--space-16);
+  margin-bottom: var(--space-4);
 }
 h2 {
-  color: #1f2933;
-  margin: 0 0 8px;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
 }
 p {
-  color: #6b7280;
-  margin: 0 0 24px;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-6);
 }
 .btn {
   display: inline-block;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: var(--space-2-5) var(--space-6);
+  border-radius: var(--space-2);
+  font-size: var(--space-3-5);
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   border: none;
 }
 .btn--primary {
-  background: #75482a;
-  color: #fff;
+  background: var(--color-brand-500);
+  color: var(--color-bg-surface);
 }
 .btn--primary:hover {
-  background: #5e3a22;
+  background: var(--color-brand-600);
 }

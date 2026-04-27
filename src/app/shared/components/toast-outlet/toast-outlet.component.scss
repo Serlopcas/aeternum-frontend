@@ -1,26 +1,26 @@
 .toast-container {
   position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 9999;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: var(--z-toast);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-width: 400px;
+  gap: var(--space-2);
+  max-width: var(--size-400);
 }
 .toast {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  animation: slideIn 0.25s ease;
-  font-size: 14px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--space-2-5);
+  box-shadow: 0 var(--space-2) var(--space-6) var(--color-overlay-dark-soft);
+  animation: slideIn var(--motion-duration-xslow) ease;
+  font-size: var(--space-3-5);
 }
 @keyframes slideIn {
   from {
-    transform: translateX(100%);
+    transform: translateX(var(--size-full));
     opacity: 0;
   }
   to {
@@ -29,37 +29,37 @@
   }
 }
 .toast--success {
-  background: #f0fff4;
-  border-left: 4px solid #2f855a;
-  color: #22543d;
+  background: var(--color-toast-success-bg);
+  border-left: var(--space-1) solid var(--color-success-600);
+  color: var(--color-toast-success-text);
 }
 .toast--error {
-  background: #fff5f5;
-  border-left: 4px solid #c53030;
-  color: #742a2a;
+  background: var(--color-danger-50);
+  border-left: var(--space-1) solid var(--color-danger-600);
+  color: var(--color-toast-error-text);
 }
 .toast--warning {
-  background: #fffaf0;
-  border-left: 4px solid #c05621;
-  color: #7b341e;
+  background: var(--color-toast-warning-bg);
+  border-left: var(--space-1) solid var(--color-toast-warning-border);
+  color: var(--color-toast-warning-text);
 }
 .toast--info {
-  background: #ebf8ff;
-  border-left: 4px solid #2b6cb0;
-  color: #2a4365;
+  background: var(--color-toast-info-bg);
+  border-left: var(--space-1) solid var(--color-toast-info-border);
+  color: var(--color-toast-info-text);
 }
 .toast__content {
   flex: 1;
 }
 .toast__content p {
-  margin: 4px 0 0;
-  font-weight: 400;
+  margin: var(--space-1) 0 0;
+  font-weight: var(--font-weight-regular);
 }
 .toast__close {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: var(--space-4);
   opacity: 0.5;
   padding: 0;
 }

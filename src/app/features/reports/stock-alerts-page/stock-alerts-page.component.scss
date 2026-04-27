@@ -1,58 +1,58 @@
 .filters-bar {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
   align-items: center;
 }
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: #374151;
+  gap: var(--space-1-5);
+  font-size: var(--space-3-5);
+  color: var(--color-text-secondary);
   cursor: pointer;
 }
 .card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: var(--color-bg-surface);
+  border-radius: var(--space-3);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
 }
 .table {
-  width: 100%;
+  width: var(--size-full);
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--font-size-md);
 }
 .table th {
   text-align: left;
-  padding: 8px 10px;
-  background: #fafaf8;
-  color: #6b7280;
-  font-weight: 600;
-  font-size: 11px;
+  padding: var(--space-2) var(--space-2-5);
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #e5e7eb;
+  letter-spacing: var(--letter-spacing-base);
+  border-bottom: var(--border-width-2) solid var(--color-border-default);
 }
 .table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #f3f4f6;
+  padding: var(--space-2) var(--space-2-5);
+  border-bottom: var(--border-width-1) solid var(--color-bg-subtle);
 }
 .font-mono {
   font-family: monospace;
-  font-size: 12px;
+  font-size: var(--space-3);
 }
 .stock-current {
-  color: #c53030;
-  font-weight: 600;
+  color: var(--color-danger-600);
+  font-weight: var(--font-weight-semibold);
 }
 .stock-diff {
-  color: #c53030;
-  font-weight: 600;
+  color: var(--color-danger-600);
+  font-weight: var(--font-weight-semibold);
 }
 .link {
-  color: #75482a;
-  font-weight: 500;
+  color: var(--color-brand-500);
+  font-weight: var(--font-weight-medium);
   text-decoration: none;
 }
 .link:hover {

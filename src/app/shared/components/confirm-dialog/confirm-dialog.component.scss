@@ -1,63 +1,63 @@
 .dialog-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--color-overlay-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
 }
 .dialog {
-  background: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 440px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  background: var(--color-bg-surface);
+  border-radius: var(--space-3);
+  padding: var(--space-6);
+  max-width: var(--size-440);
+  width: var(--size-ninety);
+  box-shadow: var(--shadow-modal);
 }
 .dialog__title {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: #1f2933;
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xl-sm);
+  color: var(--color-text-primary);
 }
 .dialog__message {
-  margin: 0 0 24px;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.5;
+  margin: 0 0 var(--space-6);
+  color: var(--color-text-muted);
+  font-size: var(--space-3-5);
+  line-height: var(--line-height-base);
 }
 .dialog__actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--space-2);
 }
 .btn {
-  padding: 8px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--space-2);
+  font-size: var(--space-3-5);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   border: none;
-  transition: all 0.15s;
+  transition: all var(--motion-duration-base);
 }
 .btn--primary {
-  background: #75482a;
-  color: #fff;
+  background: var(--color-brand-500);
+  color: var(--color-bg-surface);
 }
 .btn--primary:hover {
-  background: #5e3a22;
+  background: var(--color-brand-600);
 }
 .btn--secondary {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
 }
 .btn--secondary:hover {
-  background: #e5e7eb;
+  background: var(--color-border-default);
 }
 .btn--danger {
-  background: #c53030;
-  color: #fff;
+  background: var(--color-danger-600);
+  color: var(--color-bg-surface);
 }
 .btn--danger:hover {
-  background: #9b2c2c;
+  background: var(--color-danger-700);
 }

@@ -590,12 +590,7 @@
           }
           @if (imagePreview()) {
             <div class="form-group">
-              <img
-                [src]="imagePreview()"
-                alt="Vista previa"
-                class="image-thumb"
-                style="max-width: 200px; max-height: 150px; border-radius: 8px"
-              />
+              <img [src]="imagePreview()" alt="Vista previa" class="image-thumb u-media-preview" />
             </div>
           }
           <div class="form-group">

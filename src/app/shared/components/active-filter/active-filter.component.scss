@@ -1,14 +1,14 @@
 .filter-select {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-  background: #fff;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-1) solid var(--color-border-strong);
+  border-radius: var(--space-2);
+  font-size: var(--space-3-5);
+  background: var(--color-bg-surface);
   outline: none;
   cursor: pointer;
-  min-width: 120px;
+  min-width: var(--size-120);
 }
 .filter-select:focus {
-  border-color: #75482a;
-  box-shadow: 0 0 0 3px rgba(117, 72, 42, 0.1);
+  border-color: var(--color-brand-500);
+  box-shadow: var(--shadow-focus-brand);
 }

@@ -1,23 +1,23 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: #f8f5f0;
+  background: var(--color-bg-page);
 }
 .shell__main {
   flex: 1;
-  margin-left: 256px;
+  margin-left: var(--layout-sidebar-width);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  transition: margin-left 0.2s ease;
+  transition: margin-left var(--motion-duration-slow) var(--motion-ease-standard);
 }
 .shell__main--collapsed {
-  margin-left: 64px;
+  margin-left: var(--layout-sidebar-width-collapsed);
 }
 .shell__content {
   flex: 1;
-  padding: 24px 32px;
-  max-width: 1400px;
-  width: 100%;
+  padding: var(--space-6) var(--space-8);
+  max-width: var(--layout-content-max-width);
+  width: var(--size-full);
   margin: 0 auto;
 }
