@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -87,4 +89,30 @@
 }
 .sidebar__toggle:hover {
   background: var(--color-overlay-white-08);
+}
+
+// ── Tablet AND mobile: off-canvas drawer ──
+@include bp.tablet-down {
+  .sidebar {
+    width: var(--layout-sidebar-width);
+    transform: translateX(-100%);
+    transition:
+      transform var(--motion-duration-slow) var(--motion-ease-standard),
+      width var(--motion-duration-slow) var(--motion-ease-standard);
+    z-index: var(--z-sticky);
+  }
+  .sidebar--mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar__toggle--desktop {
+    display: none;
+  }
+}
+
+// ── Mobile: larger touch targets ──
+@include bp.mobile-only {
+  .sidebar__item {
+    padding: var(--space-3) var(--space-3);
+    min-height: var(--touch-target);
+  }
 }

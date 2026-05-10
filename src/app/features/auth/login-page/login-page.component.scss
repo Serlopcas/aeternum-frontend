@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .login-page {
   min-height: 100vh;
   display: flex;
@@ -56,6 +58,7 @@
   font-size: var(--space-3-5);
   outline: none;
   transition: border-color var(--motion-duration-base);
+  min-height: var(--touch-target);
 }
 .form-input:focus {
   border-color: var(--color-brand-500);
@@ -69,6 +72,7 @@
   cursor: pointer;
   border: none;
   transition: all var(--motion-duration-base);
+  min-height: var(--touch-target);
 }
 .btn--primary {
   background: var(--color-brand-500);
@@ -78,9 +82,24 @@
   background: var(--color-brand-600);
 }
 .btn--primary:disabled {
-  opacity: 0.6;
+  opacity: var(--opacity-disabled);
   cursor: not-allowed;
 }
 .btn--full {
   width: var(--size-full);
+}
+
+// ── Mobile ──
+@include bp.mobile-only {
+  .login-page {
+    padding: var(--space-4);
+    align-items: flex-start;
+    padding-top: var(--space-12);
+  }
+  .login-card {
+    padding: var(--space-6);
+  }
+  .login-card__brand {
+    margin-bottom: var(--space-6);
+  }
 }

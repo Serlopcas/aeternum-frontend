@@ -1,3 +1,9 @@
+@use 'styles/breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
 .tabs {
   display: flex;
   gap: 0;
@@ -181,7 +187,7 @@
   background: var(--color-bg-surface);
   border: var(--border-width-1) solid var(--color-border-default);
   border-radius: var(--space-3);
-  padding: var(--font-size-xl-sm) var(--space-5);
+  padding: var(--space-4-5) var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-2-5);
@@ -196,7 +202,7 @@
   }
 
   &--inactive {
-    opacity: 0.65;
+    opacity: var(--opacity-out-of-stock);
   }
 
   &__header {
@@ -283,24 +289,10 @@
   margin-bottom: var(--space-5);
 }
 
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-overlay-dark-30);
-  z-index: var(--z-sticky);
-}
 .dialog {
-  position: fixed;
-  top: var(--size-half);
-  left: var(--size-half);
-  transform: translate(-var(--size-half), -var(--size-half));
-  background: var(--color-bg-surface);
-  border-radius: var(--space-4);
   padding: var(--space-7);
-  width: var(--size-480);
-  max-width: 95vw;
-  z-index: 101;
-  box-shadow: var(--shadow-dialog);
+  width: var(--dialog-width-md);
+  max-width: 90vw;
 }
 .dialog h3 {
   margin: 0 0 var(--space-5);
@@ -388,6 +380,76 @@ textarea.form-input {
   font-size: var(--font-size-md);
 }
 .btn:disabled {
-  opacity: 0.5;
+  opacity: var(--opacity-inactive);
   cursor: not-allowed;
+}
+
+// ── Responsive ──
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  contain: inline-size;
+  width: 100%;
+}
+
+@include bp.tablet-down {
+  .stock-cards {
+    grid-template-columns: repeat(auto-fill, minmax(var(--size-220), 1fr));
+  }
+  .filters-row {
+    gap: var(--space-2);
+  }
+  .date-range {
+    flex-wrap: wrap;
+  }
+  .table th:first-child,
+  .table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: var(--z-sticky-col);
+  }
+  .table th:first-child {
+    background: var(--color-bg-muted);
+  }
+  .table td:first-child {
+    background: var(--color-bg-surface);
+  }
+}
+
+@include bp.mobile-only {
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filters-grid {
+    gap: var(--space-2);
+  }
+  .filters-bar {
+    gap: var(--space-2);
+  }
+  .date-range {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .quick-dates {
+    gap: var(--space-1);
+  }
+  .page-size-selector {
+    margin-left: 0;
+  }
+  .stock-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+  .dialog {
+    width: 100%;
+    max-width: 100%;
+  }
+  .dialog-actions {
+    flex-direction: column-reverse;
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
 }

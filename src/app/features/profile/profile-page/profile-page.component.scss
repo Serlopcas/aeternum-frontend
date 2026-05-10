@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .card {
   background: var(--color-bg-surface);
   border-radius: var(--space-3);
@@ -109,7 +111,7 @@
   background: var(--color-brand-600);
 }
 .btn--primary:disabled {
-  opacity: 0.6;
+  opacity: var(--opacity-disabled);
   cursor: not-allowed;
 }
 .btn--secondary {
@@ -129,4 +131,32 @@
 .btn--sm {
   padding: var(--space-1-5) var(--space-3-5);
   font-size: var(--font-size-md);
+}
+
+// ── Responsive ──
+@include bp.tablet-down {
+  .card {
+    max-width: 100%;
+  }
+}
+
+@include bp.mobile-only {
+  .card {
+    padding: var(--space-5);
+  }
+  .avatar-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .form-actions {
+    justify-content: stretch;
+    .btn {
+      width: 100%;
+      min-height: var(--touch-target);
+    }
+  }
 }

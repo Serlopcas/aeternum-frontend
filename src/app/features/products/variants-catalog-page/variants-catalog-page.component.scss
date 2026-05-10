@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 // ─── Filters bar ───
 .filters-bar {
   display: flex;
@@ -196,24 +198,8 @@
 }
 
 // ─── Product selector dialog ───
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  padding-left: var(--size-256);
-  background: var(--color-overlay-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-overlay);
-}
-
-.dialog {
-  background: var(--color-bg-surface);
-  border-radius: var(--space-3);
-  padding: var(--space-8);
-  max-width: var(--size-480);
-  width: var(--size-ninety);
-  box-shadow: var(--shadow-modal);
+:host {
+  --dialog-max-w: var(--dialog-width-md);
 }
 
 .dialog__title {
@@ -223,9 +209,6 @@
 }
 
 .dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
   margin-top: var(--space-4);
 }
 
@@ -300,5 +283,26 @@
   &__code {
     font-size: var(--space-3);
     color: var(--color-text-muted);
+  }
+}
+
+// ── Responsive ──
+@include bp.tablet-down {
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--size-200), 1fr));
+  }
+}
+
+@include bp.mobile-only {
+  .filters-bar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--size-160), 1fr));
+    gap: var(--space-3);
+  }
+  .page-size-selector {
+    margin-left: 0;
   }
 }

@@ -1,19 +1,10 @@
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-overlay-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-overlay);
+@use 'styles/breakpoints' as bp;
+
+:host {
+  --dialog-max-w: var(--dialog-width-xs);
 }
 .dialog {
-  background: var(--color-bg-surface);
-  border-radius: var(--space-3);
   padding: var(--space-6);
-  max-width: var(--size-440);
-  width: var(--size-ninety);
-  box-shadow: var(--shadow-modal);
 }
 .dialog__title {
   margin: 0 0 var(--space-2);
@@ -27,9 +18,7 @@
   line-height: var(--line-height-base);
 }
 .dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 .btn {
   padding: var(--space-2) var(--space-5);
@@ -39,6 +28,7 @@
   cursor: pointer;
   border: none;
   transition: all var(--motion-duration-base);
+  min-height: var(--space-10);
 }
 .btn--primary {
   background: var(--color-brand-500);
@@ -60,4 +50,15 @@
 }
 .btn--danger:hover {
   background: var(--color-danger-700);
+}
+
+// ── Mobile: bottom sheet ──
+@include bp.mobile-only {
+  .dialog__actions {
+    flex-direction: column-reverse;
+    .btn {
+      width: 100%;
+      min-height: var(--space-12);
+    }
+  }
 }

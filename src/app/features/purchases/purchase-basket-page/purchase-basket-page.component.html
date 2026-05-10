@@ -276,48 +276,60 @@
             class="cart-line"
             [class.validation-error]="line.validationStatus && line.validationStatus !== 'VALID'"
           >
-            @if (line.imageUrl) {
-              <img class="line-thumb" [src]="line.imageUrl" [alt]="line.sku" />
-            } @else {
-              <div class="line-thumb line-thumb--placeholder">📷</div>
-            }
-            <div class="line-info">
-              <span class="line-sku font-mono">{{ line.sku }}</span>
-              <span class="line-name">{{ line.productName }}</span>
-              @if (line.supplierReference) {
-                <span class="line-ref">Ref: {{ line.supplierReference }}</span>
+            <div class="line-main">
+              @if (line.imageUrl) {
+                <img class="line-thumb" [src]="line.imageUrl" [alt]="line.sku" />
+              } @else {
+                <div class="line-thumb line-thumb--placeholder">📷</div>
               }
+              <div class="line-body">
+                <div class="line-row line-row--top">
+                  <span class="line-name">{{ line.productName }}</span>
+                  <button
+                    class="line-remove"
+                    (click)="basket.removeLine(line.localId)"
+                    [attr.aria-label]="'Eliminar línea ' + line.sku"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="line-row line-row--meta">
+                  <span class="line-sku font-mono">{{ line.sku }}</span>
+                  @if (line.supplierReference) {
+                    <span class="line-ref">Ref: {{ line.supplierReference }}</span>
+                  }
+                </div>
+                <div class="line-row line-row--controls">
+                  <div class="line-controls">
+                    <input
+                      class="qty-input"
+                      type="number"
+                      min="1"
+                      [ngModel]="line.quantityOrdered"
+                      (ngModelChange)="
+                        basket.updateLine(line.localId, { quantityOrdered: +$event })
+                      "
+                      aria-label="Cantidad"
+                    />
+                    <span class="line-x">×</span>
+                    <input
+                      class="cost-input"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      [ngModel]="line.unitCostSnapshot"
+                      (ngModelChange)="
+                        basket.updateLine(line.localId, { unitCostSnapshot: +$event })
+                      "
+                      aria-label="Coste unitario"
+                    />
+                  </div>
+                  <div class="line-subtotal">
+                    {{ line.quantityOrdered * line.unitCostSnapshot | appCurrency }}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="line-controls">
-              <input
-                class="qty-input"
-                type="number"
-                min="1"
-                [ngModel]="line.quantityOrdered"
-                (ngModelChange)="basket.updateLine(line.localId, { quantityOrdered: +$event })"
-                aria-label="Cantidad"
-              />
-              <span class="line-x">×</span>
-              <input
-                class="cost-input"
-                type="number"
-                step="0.01"
-                min="0"
-                [ngModel]="line.unitCostSnapshot"
-                (ngModelChange)="basket.updateLine(line.localId, { unitCostSnapshot: +$event })"
-                aria-label="Coste unitario"
-              />
-            </div>
-            <div class="line-subtotal">
-              {{ line.quantityOrdered * line.unitCostSnapshot | appCurrency }}
-            </div>
-            <button
-              class="line-remove"
-              (click)="basket.removeLine(line.localId)"
-              [attr.aria-label]="'Eliminar línea ' + line.sku"
-            >
-              ✕
-            </button>
           </div>
         }
       </div>

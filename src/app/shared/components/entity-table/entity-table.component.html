@@ -1,59 +1,61 @@
-<table class="table">
-  <thead>
-    <tr>
-      @for (col of columns(); track col.key) {
-        <th [style.width]="col.width ?? null">{{ col.header }}</th>
-      }
-      @if (showStatus()) {
-        <th>Estado</th>
-      }
-      @if (actions().length) {
-        <th>Acciones</th>
-      }
-    </tr>
-  </thead>
-  <tbody>
-    @for (row of rows(); track trackBy()(row)) {
-      <tr [class.row--inactive]="!row.active">
+<div class="table-wrapper">
+  <table class="table">
+    <thead>
+      <tr>
         @for (col of columns(); track col.key) {
-          <td [class]="col.cssClass ?? ''">{{ col.value(row) }}</td>
+          <th [style.width]="col.width ?? null">{{ col.header }}</th>
         }
         @if (showStatus()) {
-          <td>
-            <app-status-badge
-              [label]="row.active ? 'Activo' : 'Inactivo'"
-              [colorClass]="getActiveColor(row.active)"
-            />
-          </td>
+          <th class="col--status">Estado</th>
         }
         @if (actions().length) {
-          <td>
-            <div class="action-btns">
-              @for (act of actions(); track $index) {
-                @if (isVisible(act, row)) {
-                  @if (act.routerLink) {
-                    <a
-                      [routerLink]="act.routerLink(row)"
-                      class="action-btn"
-                      [class]="act.cssClass ?? ''"
-                    >
-                      {{ getLabel(act, row) }}
-                    </a>
-                  } @else {
-                    <button
-                      class="action-btn"
-                      [class]="act.cssClass ?? ''"
-                      (click)="onAction(act, row)"
-                    >
-                      {{ getLabel(act, row) }}
-                    </button>
-                  }
-                }
-              }
-            </div>
-          </td>
+          <th class="col--actions">Acciones</th>
         }
       </tr>
-    }
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      @for (row of rows(); track trackBy()(row)) {
+        <tr [class.row--inactive]="!row.active">
+          @for (col of columns(); track col.key) {
+            <td [class]="col.cssClass ?? ''">{{ col.value(row) }}</td>
+          }
+          @if (showStatus()) {
+            <td class="col--status">
+              <app-status-badge
+                [label]="row.active ? 'Activo' : 'Inactivo'"
+                [colorClass]="getActiveColor(row.active)"
+              />
+            </td>
+          }
+          @if (actions().length) {
+            <td class="col--actions">
+              <div class="action-btns">
+                @for (act of actions(); track $index) {
+                  @if (isVisible(act, row)) {
+                    @if (act.routerLink) {
+                      <a
+                        [routerLink]="act.routerLink(row)"
+                        class="action-btn"
+                        [class]="act.cssClass ?? ''"
+                      >
+                        {{ getLabel(act, row) }}
+                      </a>
+                    } @else {
+                      <button
+                        class="action-btn"
+                        [class]="act.cssClass ?? ''"
+                        (click)="onAction(act, row)"
+                      >
+                        {{ getLabel(act, row) }}
+                      </button>
+                    }
+                  }
+                }
+              </div>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

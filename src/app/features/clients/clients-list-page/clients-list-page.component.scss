@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .filters-bar {
   display: flex;
   gap: var(--space-3);
@@ -27,4 +29,16 @@
 }
 .btn--primary:hover {
   background: var(--color-brand-600);
+}
+
+// ── Responsive ──
+@include bp.mobile-only {
+  .filters-bar {
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+  .card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

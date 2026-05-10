@@ -1,3 +1,9 @@
+@use 'styles/breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
 .tabs {
   display: flex;
   gap: 0;
@@ -95,7 +101,7 @@
   border-bottom: var(--border-width-1) solid var(--color-bg-subtle);
 }
 .row--inactive {
-  opacity: 0.6;
+  opacity: var(--opacity-disabled);
 }
 .font-mono {
   font-family: monospace;
@@ -139,7 +145,7 @@
   border-color: var(--color-brand-500);
 }
 .image-card.inactive {
-  opacity: 0.5;
+  opacity: var(--opacity-inactive);
 }
 .image-thumb {
   width: var(--size-full);
@@ -243,41 +249,16 @@
   padding: var(--space-1-5) var(--space-4);
   font-size: var(--font-size-md);
 }
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-overlay-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-overlay);
-}
-.dialog {
-  background: var(--color-bg-surface);
-  border-radius: var(--space-3);
-  padding: var(--space-8);
-  max-width: var(--size-520);
-  width: var(--size-ninety);
-  box-shadow: var(--shadow-modal);
+:host {
+  --dialog-max-w: var(--dialog-width-lg);
 }
 .dialog--wide {
-  max-width: var(--size-640);
-}
-.dialog h3 {
-  margin: 0 0 var(--space-5);
-  font-size: var(--space-5);
-  color: var(--color-text-primary);
-}
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
+  max-width: var(--dialog-width-2xl);
 }
 
 // ─── Tab lock indicator ───
 .tab--locked {
-  opacity: 0.5;
+  opacity: var(--opacity-inactive);
   cursor: not-allowed;
 }
 
@@ -360,7 +341,7 @@
   border: var(--border-width-1) solid var(--color-border-strong);
   border-radius: var(--space-2);
   box-shadow: 0 var(--space-2) var(--space-6) var(--color-overlay-dark-soft);
-  z-index: 10;
+  z-index: var(--z-popover);
   max-height: var(--size-240);
   overflow-y: auto;
   margin-top: var(--space-1);
@@ -413,4 +394,48 @@
   color: var(--color-text-muted);
   font-style: italic;
   margin-left: var(--space-1);
+}
+
+// ── Responsive ──
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  contain: inline-size;
+  width: 100%;
+}
+
+@include bp.tablet-down {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .table th:first-child,
+  .table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: var(--z-sticky-col);
+  }
+  .table th:first-child {
+    background: var(--color-bg-muted);
+  }
+  .table td:first-child {
+    background: var(--color-bg-surface);
+  }
+}
+
+@include bp.mobile-only {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  .card {
+    padding: var(--space-4);
+  }
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }

@@ -104,50 +104,52 @@
     <app-empty-state message="Sin movimientos que mostrar." />
   } @else {
     <div class="card">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>SKU</th>
-            <th>Producto</th>
-            <th>Tipo</th>
-            <th>Cant.</th>
-            <th>Doc. ref.</th>
-            <th>Motivo ajuste</th>
-            <th>Notas</th>
-            <th>Usuario</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (m of movPage()!.content; track m.id) {
+      <div class="table-scroll">
+        <table class="table">
+          <thead>
             <tr>
-              <td>{{ m.movementDate | appDateTime }}</td>
-              <td class="font-mono">{{ m.variantSku }}</td>
-              <td>{{ m.productName }}</td>
-              <td>
-                <span class="type-badge" [class]="getMovClass(m.movementType)">{{
-                  getMovLabel(m.movementType)
-                }}</span>
-              </td>
-              <td [class.qty-in]="m.quantity > 0" [class.qty-out]="m.quantity < 0">
-                {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
-              </td>
-              <td>
-                {{
-                  m.purchaseOrderId
-                    ? 'Compra #' + m.purchaseOrderId
-                    : m.salesOrderId
-                      ? 'Venta #' + m.salesOrderId
-                      : '—'
-                }}
-              </td>
-              <td>{{ m.adjustmentReasonName ?? '—' }}</td>
-              <td>{{ m.notes ?? '—' }}</td>
-              <td>{{ m.performedByUsername }}</td>
+              <th>Fecha</th>
+              <th>SKU</th>
+              <th>Producto</th>
+              <th>Tipo</th>
+              <th>Cant.</th>
+              <th>Doc. ref.</th>
+              <th>Motivo ajuste</th>
+              <th>Notas</th>
+              <th>Usuario</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (m of movPage()!.content; track m.id) {
+              <tr>
+                <td>{{ m.movementDate | appDateTime }}</td>
+                <td class="font-mono">{{ m.variantSku }}</td>
+                <td>{{ m.productName }}</td>
+                <td>
+                  <span class="type-badge" [class]="getMovClass(m.movementType)">{{
+                    getMovLabel(m.movementType)
+                  }}</span>
+                </td>
+                <td [class.qty-in]="m.quantity > 0" [class.qty-out]="m.quantity < 0">
+                  {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+                </td>
+                <td>
+                  {{
+                    m.purchaseOrderId
+                      ? 'Compra #' + m.purchaseOrderId
+                      : m.salesOrderId
+                        ? 'Venta #' + m.salesOrderId
+                        : '—'
+                  }}
+                </td>
+                <td>{{ m.adjustmentReasonName ?? '—' }}</td>
+                <td>{{ m.notes ?? '—' }}</td>
+                <td>{{ m.performedByUsername }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
     <app-pagination
       [currentPage]="movPage()!.number"
@@ -244,82 +246,88 @@
 }
 
 @if (showAdjustDialog) {
-  <div class="backdrop" (click)="showAdjustDialog = false"></div>
-  <div class="dialog" role="dialog" aria-label="Nuevo ajuste de inventario">
-    <h3>Nuevo ajuste de inventario</h3>
-    <div class="form-group">
-      <label class="form-label">Buscar variante</label>
-      <input
-        class="form-input"
-        placeholder="SKU o nombre..."
-        [(ngModel)]="adjQuery"
-        (input)="searchAdjVariant()"
-      />
-      @if (adjVariants().length) {
-        <ul class="variant-list">
-          @for (v of adjVariants(); track v.id) {
-            <li (click)="selectAdjVariant(v)">
-              <span class="font-mono">{{ v.sku }}</span> — {{ v.productName }}
-              {{ v.material ?? '' }} {{ v.color ?? '' }}
-            </li>
-          }
-        </ul>
-      }
-      @if (adjSelectedVariant()) {
-        <div class="selected-variant">
-          <span class="font-mono">{{ adjSelectedVariant()!.sku }}</span> —
-          {{ adjSelectedVariant()!.productName }}
-        </div>
-      }
-    </div>
-    <div class="form-group">
-      <label class="form-label">Tipo de ajuste</label>
-      <select class="form-input" [(ngModel)]="adjType">
-        <option value="ADJUSTMENT_IN">Entrada</option>
-        <option value="ADJUSTMENT_OUT">Salida</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Cantidad</label>
-      <input type="number" class="form-input" [(ngModel)]="adjQty" min="1" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Motivo *</label>
-      <select
-        class="form-input"
-        required
-        name="adjReasonId"
-        #reasonRef="ngModel"
-        [(ngModel)]="adjReasonId"
-      >
-        <option [ngValue]="null" disabled>Seleccionar...</option>
-        @for (r of adjustmentReasons(); track r.id) {
-          <option [ngValue]="r.id">{{ r.name }}</option>
+  <div class="dialog-backdrop" (click)="showAdjustDialog = false">
+    <div
+      class="dialog"
+      role="dialog"
+      aria-label="Nuevo ajuste de inventario"
+      (click)="$event.stopPropagation()"
+    >
+      <h3>Nuevo ajuste de inventario</h3>
+      <div class="form-group">
+        <label class="form-label">Buscar variante</label>
+        <input
+          class="form-input"
+          placeholder="SKU o nombre..."
+          [(ngModel)]="adjQuery"
+          (input)="searchAdjVariant()"
+        />
+        @if (adjVariants().length) {
+          <ul class="variant-list">
+            @for (v of adjVariants(); track v.id) {
+              <li (click)="selectAdjVariant(v)">
+                <span class="font-mono">{{ v.sku }}</span> — {{ v.productName }}
+                {{ v.material ?? '' }} {{ v.color ?? '' }}
+              </li>
+            }
+          </ul>
         }
-      </select>
-      @if (reasonRef.invalid && reasonRef.touched) {
-        <span class="form-error">Selecciona un motivo</span>
-      }
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notas</label>
-      <textarea class="form-input" rows="2" [(ngModel)]="adjNotes"></textarea>
-    </div>
-    <div class="dialog-actions">
-      <button
-        class="btn btn--secondary"
-        (click)="showAdjustDialog = false"
-        aria-label="Cancelar ajuste"
-      >
-        Cancelar
-      </button>
-      <button
-        class="btn btn--primary"
-        (click)="submitAdjustment()"
-        [disabled]="!adjSelectedVariant() || adjQty < 1 || !adjReasonId"
-      >
-        Crear ajuste
-      </button>
+        @if (adjSelectedVariant()) {
+          <div class="selected-variant">
+            <span class="font-mono">{{ adjSelectedVariant()!.sku }}</span> —
+            {{ adjSelectedVariant()!.productName }}
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de ajuste</label>
+        <select class="form-input" [(ngModel)]="adjType">
+          <option value="ADJUSTMENT_IN">Entrada</option>
+          <option value="ADJUSTMENT_OUT">Salida</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cantidad</label>
+        <input type="number" class="form-input" [(ngModel)]="adjQty" min="1" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motivo *</label>
+        <select
+          class="form-input"
+          required
+          name="adjReasonId"
+          #reasonRef="ngModel"
+          [(ngModel)]="adjReasonId"
+        >
+          <option [ngValue]="null" disabled>Seleccionar...</option>
+          @for (r of adjustmentReasons(); track r.id) {
+            <option [ngValue]="r.id">{{ r.name }}</option>
+          }
+        </select>
+        @if (reasonRef.invalid && reasonRef.touched) {
+          <span class="form-error">Selecciona un motivo</span>
+        }
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas</label>
+        <textarea class="form-input" rows="2" [(ngModel)]="adjNotes"></textarea>
+      </div>
+      <div class="dialog-actions">
+        <button
+          class="btn btn--secondary"
+          (click)="showAdjustDialog = false"
+          aria-label="Cancelar ajuste"
+        >
+          Cancelar
+        </button>
+        <button
+          class="btn btn--primary"
+          (click)="submitAdjustment()"
+          [disabled]="!adjSelectedVariant() || adjQty < 1 || !adjReasonId"
+        >
+          Crear ajuste
+        </button>
+      </div>
     </div>
   </div>
 }
