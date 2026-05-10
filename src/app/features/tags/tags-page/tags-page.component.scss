@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .filters-bar {
   display: flex;
   gap: var(--space-3);
@@ -118,28 +120,11 @@
   background: var(--color-brand-600);
   color: var(--color-overlay-white-90);
 }
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  padding-left: var(--size-256);
-  background: var(--color-overlay-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-overlay);
-}
-.dialog {
-  background: var(--color-bg-surface);
-  border-radius: var(--space-3);
-  padding: var(--space-8);
-  max-width: var(--size-460);
-  width: var(--size-ninety);
-  box-shadow: var(--shadow-modal);
-}
-.dialog h3 {
-  margin: 0 0 var(--space-5);
-  font-size: var(--space-5);
-  color: var(--color-text-primary);
+
+// ── Responsive ──
+
+:host {
+  --dialog-max-w: var(--dialog-width-sm);
 }
 .form {
   display: flex;
@@ -170,12 +155,6 @@
   resize: vertical;
   min-height: var(--space-12);
 }
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
 .page-size {
   display: flex;
   flex-direction: row;
@@ -191,4 +170,14 @@
 .page-size .form-input {
   width: var(--space-22);
   padding: var(--space-1-5) var(--space-2);
+}
+
+@include bp.mobile-only {
+  .filters-bar {
+    gap: var(--space-2);
+  }
+  .card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

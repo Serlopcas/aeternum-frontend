@@ -296,58 +296,60 @@
       @if (!variant()!.supplierLinks?.length) {
         <p class="empty-msg">No hay proveedores vinculados.</p>
       } @else {
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Proveedor</th>
-              <th>Ref. proveedor</th>
-              <th>Coste</th>
-              <th>Plazo entrega</th>
-              <th>Preferido</th>
-              <th>Estado</th>
-              @if (auth.isGestor()) {
-                <th>Acciones</th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-            @for (sl of variant()!.supplierLinks; track sl.id) {
-              <tr [class.row--inactive]="!sl.active">
-                <td>{{ sl.supplierName }}</td>
-                <td class="font-mono">{{ sl.supplierReference ?? '—' }}</td>
-                <td>{{ sl.basePurchaseCost | appCurrency }}</td>
-                <td>{{ sl.leadTimeDays ? sl.leadTimeDays + ' días' : '—' }}</td>
-                <td>{{ sl.isPreferredSupplier ? '⭐' : '' }}</td>
-                <td>
-                  <app-status-badge
-                    [label]="sl.active ? 'Activo' : 'Inactivo'"
-                    [colorClass]="getColor(sl.active)"
-                  />
-                </td>
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Proveedor</th>
+                <th>Ref. proveedor</th>
+                <th>Coste</th>
+                <th>Plazo entrega</th>
+                <th>Preferido</th>
+                <th>Estado</th>
                 @if (auth.isGestor()) {
-                  <td>
-                    <div class="action-btns">
-                      <button
-                        class="action-btn"
-                        (click)="editSupplierLink(sl)"
-                        [attr.aria-label]="'Editar vínculo con ' + sl.supplierName"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        class="action-btn"
-                        (click)="viewCostHistory(sl)"
-                        [attr.aria-label]="'Ver historial de costes de ' + sl.supplierName"
-                      >
-                        Hist. coste
-                      </button>
-                    </div>
-                  </td>
+                  <th>Acciones</th>
                 }
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (sl of variant()!.supplierLinks; track sl.id) {
+                <tr [class.row--inactive]="!sl.active">
+                  <td>{{ sl.supplierName }}</td>
+                  <td class="font-mono">{{ sl.supplierReference ?? '—' }}</td>
+                  <td>{{ sl.basePurchaseCost | appCurrency }}</td>
+                  <td>{{ sl.leadTimeDays ? sl.leadTimeDays + ' días' : '—' }}</td>
+                  <td>{{ sl.isPreferredSupplier ? '⭐' : '' }}</td>
+                  <td>
+                    <app-status-badge
+                      [label]="sl.active ? 'Activo' : 'Inactivo'"
+                      [colorClass]="getColor(sl.active)"
+                    />
+                  </td>
+                  @if (auth.isGestor()) {
+                    <td>
+                      <div class="action-btns">
+                        <button
+                          class="action-btn"
+                          (click)="editSupplierLink(sl)"
+                          [attr.aria-label]="'Editar vínculo con ' + sl.supplierName"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          class="action-btn"
+                          (click)="viewCostHistory(sl)"
+                          [attr.aria-label]="'Ver historial de costes de ' + sl.supplierName"
+                        >
+                          Hist. coste
+                        </button>
+                      </div>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </div>
   }
@@ -357,26 +359,28 @@
       @if (!priceHistory().length) {
         <p class="empty-msg">Sin historial de precios.</p>
       } @else {
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Anterior</th>
-              <th>Nuevo</th>
-              <th>Usuario</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (h of priceHistory(); track h.id) {
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
               <tr>
-                <td>{{ h.changedAt | appDateTime }}</td>
-                <td>{{ h.oldBaseSalePrice | appCurrency }}</td>
-                <td class="font-bold">{{ h.newBaseSalePrice | appCurrency }}</td>
-                <td>{{ h.changedByUsername }}</td>
+                <th>Fecha</th>
+                <th>Anterior</th>
+                <th>Nuevo</th>
+                <th>Usuario</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (h of priceHistory(); track h.id) {
+                <tr>
+                  <td>{{ h.changedAt | appDateTime }}</td>
+                  <td>{{ h.oldBaseSalePrice | appCurrency }}</td>
+                  <td class="font-bold">{{ h.newBaseSalePrice | appCurrency }}</td>
+                  <td>{{ h.changedByUsername }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </div>
   }
@@ -386,44 +390,46 @@
       @if (!movements().length) {
         <p class="empty-msg">Sin movimientos de stock.</p>
       } @else {
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Tipo</th>
-              <th>Cantidad</th>
-              <th>Doc. referencia</th>
-              <th>Motivo</th>
-              <th>Usuario</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (m of movements(); track m.id) {
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
               <tr>
-                <td>{{ m.movementDate | appDateTime }}</td>
-                <td>
-                  <span class="movement-type" [class]="'type-' + m.movementType">{{
-                    m.movementType
-                  }}</span>
-                </td>
-                <td [class.positive]="m.quantity > 0" [class.negative]="m.quantity < 0">
-                  {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
-                </td>
-                <td class="font-mono text-sm">
-                  {{
-                    m.purchaseOrderId
-                      ? 'Compra #' + m.purchaseOrderId
-                      : m.salesOrderId
-                        ? 'Venta #' + m.salesOrderId
-                        : '—'
-                  }}
-                </td>
-                <td>{{ m.adjustmentReasonName ?? '—' }}</td>
-                <td>{{ m.performedByUsername }}</td>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+                <th>Doc. referencia</th>
+                <th>Motivo</th>
+                <th>Usuario</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (m of movements(); track m.id) {
+                <tr>
+                  <td>{{ m.movementDate | appDateTime }}</td>
+                  <td>
+                    <span class="movement-type" [class]="'type-' + m.movementType">{{
+                      m.movementType
+                    }}</span>
+                  </td>
+                  <td [class.positive]="m.quantity > 0" [class.negative]="m.quantity < 0">
+                    {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+                  </td>
+                  <td class="font-mono text-sm">
+                    {{
+                      m.purchaseOrderId
+                        ? 'Compra #' + m.purchaseOrderId
+                        : m.salesOrderId
+                          ? 'Venta #' + m.salesOrderId
+                          : '—'
+                    }}
+                  </td>
+                  <td>{{ m.adjustmentReasonName ?? '—' }}</td>
+                  <td>{{ m.performedByUsername }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </div>
   }

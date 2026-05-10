@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .tabs {
   display: flex;
   gap: 0;
@@ -174,33 +176,8 @@
   padding: var(--space-1-5) var(--space-4);
   font-size: var(--font-size-md);
 }
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-overlay-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-overlay);
-}
-.dialog {
-  background: var(--color-bg-surface);
-  border-radius: var(--space-3);
-  padding: var(--space-8);
-  max-width: var(--size-520);
-  width: var(--size-ninety);
-  box-shadow: var(--shadow-modal);
-}
-.dialog h3 {
-  margin: 0 0 var(--space-5);
-  font-size: var(--space-5);
-  color: var(--color-text-primary);
-}
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
+:host {
+  --dialog-max-w: var(--dialog-width-lg);
 }
 
 // Catalog tab
@@ -254,4 +231,29 @@
 .badge--inactive {
   background: var(--color-bg-subtle);
   color: var(--color-text-muted);
+}
+
+// ── Responsive ──
+@include bp.tablet-down {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include bp.mobile-only {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  .card {
+    padding: var(--space-4);
+  }
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

@@ -1,6 +1,8 @@
+@use 'styles/breakpoints' as bp;
+
 .detail-grid {
   display: grid;
-  grid-template-columns: var(--size-340) 1fr;
+  grid-template-columns: var(--panel-detail-side) 1fr;
   gap: var(--space-5);
 }
 .card {
@@ -118,8 +120,33 @@
   border: var(--border-width-1) solid var(--color-border-strong);
   border-radius: var(--space-1-5);
   font-size: var(--font-size-md);
-  outline: none;
-  text-align: right;
+}
+
+// ── Responsive ──
+@include bp.tablet-down {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include bp.mobile-only {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  .card {
+    padding: var(--space-4);
+  }
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table {
+    min-width: var(--size-400);
+  }
+  .status-row {
+    flex-wrap: wrap;
+  }
 }
 .inline-input:focus {
   border-color: var(--color-brand-500);
@@ -168,9 +195,4 @@
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-@media (max-width: var(--breakpoint-md)) {
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
 }

@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .filters-bar {
   display: flex;
   gap: var(--space-3);
@@ -57,4 +59,19 @@
 }
 .link:hover {
   text-decoration: underline;
+}
+
+// ── Responsive ──
+@include bp.mobile-only {
+  .filters-bar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table {
+    min-width: var(--size-440);
+  }
 }

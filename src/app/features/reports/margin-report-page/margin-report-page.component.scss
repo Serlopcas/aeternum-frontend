@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .btn {
   padding: var(--space-2) var(--space-5);
   border-radius: var(--space-2);
@@ -157,8 +159,26 @@
   color: var(--color-danger-600);
   font-weight: var(--font-weight-semibold);
 }
-@media (max-width: var(--breakpoint-md)) {
+// ── Responsive ──
+@include bp.tablet-down {
   .kpi-row {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@include bp.mobile-only {
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .filters-bar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table {
+    min-width: var(--size-480);
   }
 }

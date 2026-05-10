@@ -1,3 +1,9 @@
+@use 'styles/breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -92,4 +98,30 @@
   border: none;
   border-top: var(--border-width-1) solid var(--color-border-default);
   margin: var(--space-1) 0;
+}
+
+// ── Tablet & Mobile ──
+@include bp.tablet-down {
+  :host {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+  }
+  .topbar__username {
+    display: none;
+  }
+  .topbar__caret {
+    display: none;
+  }
+}
+
+@include bp.mobile-only {
+  .topbar {
+    padding: 0 var(--space-4);
+    height: var(--space-14, 56px);
+  }
+  .topbar__menu {
+    right: 0;
+    min-width: var(--size-180);
+  }
 }

@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .shell {
   display: flex;
   min-height: 100vh;
@@ -9,6 +11,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
   transition: margin-left var(--motion-duration-slow) var(--motion-ease-standard);
 }
 .shell__main--collapsed {
@@ -19,5 +22,74 @@
   padding: var(--space-6) var(--space-8);
   max-width: var(--layout-content-max-width);
   width: var(--size-full);
+  min-width: 0;
   margin: 0 auto;
+}
+
+// ── Hamburger button styles ──
+.topbar__hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  line-height: 1;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  align-items: center;
+  justify-content: center;
+  transition: background var(--motion-duration-base);
+}
+.topbar__hamburger:hover {
+  background: var(--color-bg-subtle);
+}
+.topbar__hamburger-icon {
+  font-size: var(--font-size-xl);
+}
+
+// ── Mobile overlay backdrop ──
+.shell__overlay {
+  display: none;
+}
+
+// ── Tablet & Mobile ──
+@include bp.tablet-down {
+  .topbar__hamburger {
+    display: flex;
+  }
+  .shell__main {
+    margin-left: 0;
+  }
+  .shell__main--collapsed {
+    margin-left: 0;
+  }
+  .shell__content {
+    padding: var(--space-5) var(--space-6);
+    overflow-x: hidden;
+  }
+  .shell__overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--color-overlay-backdrop);
+    z-index: calc(var(--z-sticky) - 1);
+    animation: fadeIn var(--motion-duration-base) ease;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+// ── Mobile ──
+@include bp.mobile-only {
+  .shell__content {
+    padding: var(--space-4) var(--space-4);
+  }
 }

@@ -121,3 +121,13 @@
     </form>
   </div>
 }
+
+<app-confirm-dialog
+  [open]="confirmDeleteAvatar()"
+  title="Eliminar foto de perfil"
+  message="¿Eliminar tu foto de perfil? Esta acción no se puede deshacer."
+  confirmLabel="Eliminar"
+  [destructive]="true"
+  (confirm)="confirmAvatarDelete()"
+  (cancel)="confirmDeleteAvatar.set(false)"
+/>

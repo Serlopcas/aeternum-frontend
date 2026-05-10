@@ -1,4 +1,8 @@
-<aside class="sidebar" [class.sidebar--collapsed]="collapsed()">
+<aside
+  class="sidebar"
+  [class.sidebar--collapsed]="collapsed()"
+  [class.sidebar--mobile-open]="mobileOpen()"
+>
   <div class="sidebar__brand">
     <span class="sidebar__logo">◆</span>
     @if (!collapsed()) {
@@ -28,7 +32,7 @@
   </nav>
 
   <button
-    class="sidebar__toggle"
+    class="sidebar__toggle sidebar__toggle--desktop"
     (click)="collapsed.set(!collapsed())"
     [attr.aria-label]="collapsed() ? 'Expandir menú lateral' : 'Contraer menú lateral'"
   >

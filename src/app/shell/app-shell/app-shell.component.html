@@ -1,7 +1,21 @@
 <div class="shell">
-  <app-sidebar [(collapsed)]="sidebarCollapsed" />
+  <app-sidebar [(collapsed)]="sidebarCollapsed" [(mobileOpen)]="mobileSidebarOpen" />
+
+  @if (mobileSidebarOpen()) {
+    <div class="shell__overlay" aria-hidden="true" (click)="closeMobileSidebar()"></div>
+  }
+
   <div class="shell__main" [class.shell__main--collapsed]="sidebarCollapsed()">
-    <app-topbar />
+    <app-topbar>
+      <button
+        class="topbar__hamburger"
+        type="button"
+        aria-label="Abrir menú"
+        (click)="mobileSidebarOpen.set(true)"
+      >
+        <span class="topbar__hamburger-icon">☰</span>
+      </button>
+    </app-topbar>
     <main class="shell__content">
       <router-outlet />
     </main>

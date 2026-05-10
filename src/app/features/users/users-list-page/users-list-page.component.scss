@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .filters-bar {
   display: flex;
   gap: var(--space-3);
@@ -45,7 +47,7 @@
   background: var(--color-bg-muted);
 }
 .row--inactive {
-  opacity: 0.6;
+  opacity: var(--opacity-disabled);
 }
 .font-mono {
   font-family: monospace;
@@ -97,27 +99,24 @@
   background: var(--color-bg-subtle);
   color: var(--color-text-secondary);
 }
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-overlay-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-overlay);
+
+// ── Responsive ──
+@include bp.mobile-only {
+  .filters-bar {
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+  .card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table {
+    min-width: var(--size-480);
+  }
 }
-.dialog {
-  background: var(--color-bg-surface);
-  border-radius: var(--space-3);
-  padding: var(--space-8);
-  max-width: var(--size-560);
-  width: var(--size-ninety);
-  box-shadow: var(--shadow-modal);
-}
-.dialog h3 {
-  margin: 0 0 var(--space-5);
-  font-size: var(--space-5);
-  color: var(--color-text-primary);
+
+:host {
+  --dialog-max-w: var(--dialog-width-xl);
 }
 .form {
   display: flex;
@@ -148,10 +147,4 @@
 }
 .form-input:focus {
   border-color: var(--color-brand-500);
-}
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
 }

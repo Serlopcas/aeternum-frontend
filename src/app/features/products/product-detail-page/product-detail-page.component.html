@@ -329,63 +329,65 @@
       @if (!product()!.variants?.length) {
         <p class="empty-msg">No hay variantes registradas.</p>
       } @else {
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>SKU</th>
-              <th>Material</th>
-              <th>Color</th>
-              <th>{{ primaryMeasureLabel() }}</th>
-              <th>Peso (g)</th>
-              <th>Precio</th>
-              <th>Stock min.</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (v of product()!.variants; track v.id) {
-              <tr [class.row--inactive]="!v.active">
-                <td>{{ variantName(v) }}</td>
-                <td class="font-mono">{{ v.sku }}</td>
-                <td>{{ v.material ?? '—' }}</td>
-                <td>{{ v.color ?? '—' }}</td>
-                <td>{{ v.primaryMeasureValue ?? '—' }}</td>
-                <td>{{ v.weightGrams ?? '—' }}</td>
-                <td>{{ v.baseSalePrice | appCurrency }}</td>
-                <td>{{ v.minimumStock }}</td>
-                <td>
-                  <app-status-badge
-                    [label]="v.active ? 'Activo' : 'Inactivo'"
-                    [colorClass]="getColor(v.active)"
-                  />
-                </td>
-                <td>
-                  <div class="action-btns">
-                    <a
-                      [routerLink]="['/products', product()!.id, 'variants', v.id]"
-                      class="action-btn"
-                      [attr.aria-label]="'Ver variante ' + v.sku"
-                      >Ver</a
-                    >
-                    @if (auth.isGestor()) {
-                      <button
-                        class="action-btn"
-                        (click)="toggleVariant(v)"
-                        [attr.aria-label]="
-                          (v.active ? 'Desactivar' : 'Activar') + ' variante ' + v.sku
-                        "
-                      >
-                        {{ v.active ? 'Desact.' : 'Act.' }}
-                      </button>
-                    }
-                  </div>
-                </td>
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>SKU</th>
+                <th>Material</th>
+                <th>Color</th>
+                <th>{{ primaryMeasureLabel() }}</th>
+                <th>Peso (g)</th>
+                <th>Precio</th>
+                <th>Stock min.</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (v of product()!.variants; track v.id) {
+                <tr [class.row--inactive]="!v.active">
+                  <td>{{ variantName(v) }}</td>
+                  <td class="font-mono">{{ v.sku }}</td>
+                  <td>{{ v.material ?? '—' }}</td>
+                  <td>{{ v.color ?? '—' }}</td>
+                  <td>{{ v.primaryMeasureValue ?? '—' }}</td>
+                  <td>{{ v.weightGrams ?? '—' }}</td>
+                  <td>{{ v.baseSalePrice | appCurrency }}</td>
+                  <td>{{ v.minimumStock }}</td>
+                  <td>
+                    <app-status-badge
+                      [label]="v.active ? 'Activo' : 'Inactivo'"
+                      [colorClass]="getColor(v.active)"
+                    />
+                  </td>
+                  <td>
+                    <div class="action-btns">
+                      <a
+                        [routerLink]="['/products', product()!.id, 'variants', v.id]"
+                        class="action-btn"
+                        [attr.aria-label]="'Ver variante ' + v.sku"
+                        >Ver</a
+                      >
+                      @if (auth.isGestor()) {
+                        <button
+                          class="action-btn"
+                          (click)="toggleVariant(v)"
+                          [attr.aria-label]="
+                            (v.active ? 'Desactivar' : 'Activar') + ' variante ' + v.sku
+                          "
+                        >
+                          {{ v.active ? 'Desact.' : 'Act.' }}
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </div>
   }

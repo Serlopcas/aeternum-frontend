@@ -1,8 +1,15 @@
+@use 'styles/breakpoints' as bp;
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .table {
   width: var(--size-full);
   border-collapse: collapse;
   font-size: var(--space-3-5);
-  table-layout: fixed;
 }
 
 .table th {
@@ -43,6 +50,17 @@
   font-size: var(--font-size-md);
 }
 
+.col--status {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.col--actions {
+  text-align: right;
+  white-space: nowrap;
+  overflow: visible;
+}
+
 .action-btns {
   display: flex;
   gap: var(--space-2);
@@ -57,6 +75,7 @@
   font-size: var(--space-3);
   color: var(--color-text-secondary);
   text-decoration: none;
+  min-height: var(--space-8);
 }
 
 .action-btn:hover {
@@ -70,4 +89,18 @@
 
 .action-btn--danger:hover {
   background: var(--color-danger-50);
+}
+
+// ── Responsive ──
+@include bp.mobile-only {
+  .table th,
+  .table td {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-sm);
+  }
+  .action-btn {
+    padding: var(--space-1-5) var(--space-2);
+    font-size: var(--font-size-xs);
+    min-height: var(--space-9);
+  }
 }

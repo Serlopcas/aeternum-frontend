@@ -1,0 +1,49 @@
+// ── Responsive Breakpoints ──────────────────────────────────────────────────
+//
+// Centralizes media-query breakpoints for the whole application.
+// Change the numeric values below to update breakpoints globally.
+//
+// Ranges (semantic):
+//   Mobile:  0px – 767px     -> `@include bp.mobile-only { ... }`
+//   Tablet:  768px – 1023px  -> `@include bp.tablet-down { ... }`
+//   Desktop: 1024px+         -> default styles (no media query)
+//
+// Usage from any component SCSS (requires `stylePreprocessorOptions.includePaths`):
+//   @use 'styles/breakpoints' as bp;
+//   @include bp.tablet-down { ... }
+//   @include bp.mobile-only { ... }
+// ────────────────────────────────────────────────────────────────────────────
+
+// Base values for each semantic breakpoint (integers used for arithmetic)
+$bp-tablet: 768;
+$bp-desktop: 1024;
+
+// ── Mixins ──────────────────────────────────────────────────────────────────
+
+/// Apply styles for tablet and mobile (≤1023px)
+@mixin tablet-down {
+  @media (max-width: #{$bp-desktop - 1}px) {
+    @content;
+  }
+}
+
+/// Apply styles only for mobile (≤767px)
+@mixin mobile-only {
+  @media (max-width: #{$bp-tablet - 1}px) {
+    @content;
+  }
+}
+
+/// Apply styles only for tablet (768px – 1023px)
+@mixin tablet-only {
+  @media (min-width: #{$bp-tablet}px) and (max-width: #{$bp-desktop - 1}px) {
+    @content;
+  }
+}
+
+/// Apply styles only for desktop (≥1024px)
+@mixin desktop-only {
+  @media (min-width: #{$bp-desktop}px) {
+    @content;
+  }
+}

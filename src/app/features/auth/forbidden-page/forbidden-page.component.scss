@@ -1,3 +1,5 @@
+@use 'styles/breakpoints' as bp;
+
 .forbidden {
   text-align: center;
   padding: var(--space-20) var(--space-6);
@@ -29,4 +31,16 @@ p {
 }
 .btn--primary:hover {
   background: var(--color-brand-600);
+}
+
+// ── Responsive ──
+@include bp.mobile-only {
+  .forbidden {
+    padding: var(--space-12) var(--space-4);
+  }
+  .btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }

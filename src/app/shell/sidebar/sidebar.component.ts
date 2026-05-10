@@ -27,6 +27,7 @@ export class SidebarComponent {
   private readonly auth = inject(AuthStateService);
   private readonly router = inject(Router);
   collapsed = model(false);
+  mobileOpen = model(false);
   private readonly currentUrl = signal(this.router.url);
 
   constructor() {
@@ -35,7 +36,10 @@ export class SidebarComponent {
         filter((e) => e instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
-      .subscribe((e) => this.currentUrl.set((e as NavigationEnd).urlAfterRedirects));
+      .subscribe((e) => {
+        this.currentUrl.set((e as NavigationEnd).urlAfterRedirects);
+        this.mobileOpen.set(false);
+      });
   }
 
   isItemActive(route: string): boolean {

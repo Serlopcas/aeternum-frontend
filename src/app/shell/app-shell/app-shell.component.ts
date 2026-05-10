@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastOutletComponent } from '../../shared/components/toast-outlet/toast-outlet.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -13,4 +13,14 @@ import { TopbarComponent } from '../topbar/topbar.component';
 })
 export class AppShellComponent {
   sidebarCollapsed = signal(false);
+  mobileSidebarOpen = signal(false);
+
+  closeMobileSidebar(): void {
+    this.mobileSidebarOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.mobileSidebarOpen.set(false);
+  }
 }

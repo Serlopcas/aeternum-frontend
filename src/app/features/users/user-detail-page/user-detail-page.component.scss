@@ -1,6 +1,8 @@
+@use 'styles/breakpoints' as bp;
+
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr var(--size-360);
+  grid-template-columns: 1fr var(--panel-user-side);
   gap: var(--space-6);
 }
 .card {
@@ -92,27 +94,8 @@
   padding: var(--space-1-5) 0;
   cursor: pointer;
 }
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-overlay-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-overlay);
-}
-.dialog {
-  background: var(--color-bg-surface);
-  border-radius: var(--space-3);
-  padding: var(--space-8);
-  max-width: var(--size-420);
-  width: var(--size-ninety);
-  box-shadow: var(--shadow-modal);
-}
-.dialog h3 {
-  margin: 0 0 var(--space-5);
-  font-size: var(--space-5);
-  color: var(--color-text-primary);
+:host {
+  --dialog-max-w: var(--size-420);
 }
 .form {
   display: flex;
@@ -139,14 +122,23 @@
 .form-input:focus {
   border-color: var(--color-brand-500);
 }
-.dialog__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-@media (max-width: var(--breakpoint-md)) {
+// ── Responsive ──
+@include bp.tablet-down {
   .detail-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@include bp.mobile-only {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  .card {
+    padding: var(--space-4);
+  }
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }

@@ -6,7 +6,7 @@
 .empty-state__icon {
   font-size: var(--space-12);
   margin-bottom: var(--space-4);
-  opacity: 0.5;
+  opacity: var(--opacity-inactive);
 }
 .empty-state__title {
   margin: 0 0 var(--space-2);

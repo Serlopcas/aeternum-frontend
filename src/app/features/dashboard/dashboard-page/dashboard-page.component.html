@@ -79,28 +79,30 @@
         </select>
       </div>
       @if (stockAlerts().length > 0) {
-        <table class="table">
-          <thead>
-            <tr>
-              <th>SKU</th>
-              <th>Producto</th>
-              <th>Stock actual</th>
-              <th>Mínimo</th>
-              <th>Déficit</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (a of stockAlerts(); track a.variantId) {
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
               <tr>
-                <td class="font-mono">{{ a.sku }}</td>
-                <td>{{ a.productName }}</td>
-                <td class="text-right">{{ a.currentStock }}</td>
-                <td class="text-right">{{ a.minimumStock }}</td>
-                <td class="text-right text-danger">{{ a.differenceToMinimum }}</td>
+                <th>SKU</th>
+                <th>Producto</th>
+                <th>Stock actual</th>
+                <th>Mínimo</th>
+                <th>Déficit</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (a of stockAlerts(); track a.variantId) {
+                <tr>
+                  <td class="font-mono">{{ a.sku }}</td>
+                  <td>{{ a.productName }}</td>
+                  <td class="text-right">{{ a.currentStock }}</td>
+                  <td class="text-right">{{ a.minimumStock }}</td>
+                  <td class="text-right text-danger">{{ a.differenceToMinimum }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       } @else {
         <p class="empty-msg">No hay variantes con stock por debajo del mínimo.</p>
       }

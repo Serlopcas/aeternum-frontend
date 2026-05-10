@@ -5,13 +5,20 @@ import { AuthApiService } from '../../../core/services/auth-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { AuthStateService } from '../../../core/state/auth-state.service';
 import { ApiErrorAlertComponent } from '../../../shared/components/api-error-alert/api-error-alert.component';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-profile-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ApiErrorAlertComponent, PageHeaderComponent, LoadingSpinnerComponent],
+  imports: [
+    FormsModule,
+    ApiErrorAlertComponent,
+    PageHeaderComponent,
+    LoadingSpinnerComponent,
+    ConfirmDialogComponent,
+  ],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
 })
@@ -25,6 +32,7 @@ export class ProfilePageComponent implements OnInit {
   error = signal<ApiError | null>(null);
   user = signal<UserResponse | null>(null);
   avatarPreview = signal<string | null>(null);
+  confirmDeleteAvatar = signal(false);
 
   firstName = '';
   lastName = '';
@@ -105,6 +113,11 @@ export class ProfilePageComponent implements OnInit {
   }
 
   deleteAvatar(): void {
+    this.confirmDeleteAvatar.set(true);
+  }
+
+  confirmAvatarDelete(): void {
+    this.confirmDeleteAvatar.set(false);
     this.authApi.deleteAvatar().subscribe({
       next: (u) => {
         this.user.set(u);
