@@ -118,7 +118,7 @@
 @include bp.mobile-only {
   .topbar {
     padding: 0 var(--space-4);
-    height: var(--space-14, 56px);
+    height: var(--layout-topbar-height-mobile);
   }
   .topbar__menu {
     right: 0;

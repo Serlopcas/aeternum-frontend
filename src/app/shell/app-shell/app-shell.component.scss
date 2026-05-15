@@ -72,7 +72,7 @@
   .shell__overlay {
     display: block;
     position: fixed;
-    inset: 0;
+    inset: var(--layout-topbar-height) 0 0 0;
     background: var(--color-overlay-backdrop);
     z-index: calc(var(--z-sticky) - 1);
     animation: fadeIn var(--motion-duration-base) ease;
@@ -91,5 +91,8 @@
 @include bp.mobile-only {
   .shell__content {
     padding: var(--space-4) var(--space-4);
+  }
+  .shell__overlay {
+    inset: var(--layout-topbar-height-mobile) 0 0 0;
   }
 }

@@ -20,16 +20,12 @@
   text-align: center;
   margin-bottom: var(--space-8);
 }
-.login-card__logo {
-  font-size: var(--space-10);
-  color: var(--color-brand-500);
-}
-.login-card__title {
-  margin: var(--space-2) 0 var(--space-1);
-  font-size: var(--space-7);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  letter-spacing: var(--border-width-1);
+.login-card__logo-img {
+  display: block;
+  margin: 0 auto var(--space-3);
+  height: var(--space-16);
+  width: auto;
+  max-width: var(--size-full);
 }
 .login-card__subtitle {
   margin: 0;

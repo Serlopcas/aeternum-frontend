@@ -52,6 +52,7 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-13: 52px;
+  --space-14: 56px;
   --space-16: 64px;
   --space-18: 72px;
   --space-20: 80px;
@@ -201,8 +202,10 @@
   --space-rem-2: 0.5rem;
   --filter-grayscale-muted: 30%;
 
-  --layout-sidebar-width-collapsed: 64px;
+  --layout-sidebar-width-collapsed: var(--size-110);
   --layout-sidebar-width: 256px;
+  --layout-topbar-height: var(--space-16);
+  --layout-topbar-height-mobile: var(--space-14);
   --layout-content-max-width: 1400px;
 
   /* Dialog widths */
