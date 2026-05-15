@@ -4,17 +4,14 @@
   [class.sidebar--mobile-open]="mobileOpen()"
 >
   <div class="sidebar__brand">
-    <span class="sidebar__logo">◆</span>
-    @if (!collapsed()) {
-      <span class="sidebar__name">Aeternum</span>
-    }
+    <a class="sidebar__brand-link" routerLink="/" title="Inicio">
+      <img class="sidebar__brand-img" src="assets/AeternumTrackLogo.svg" alt="Aeternum Track" />
+    </a>
   </div>
 
   <nav class="sidebar__nav" aria-label="Menú principal">
     @for (section of filteredSections(); track section.title) {
-      @if (!collapsed()) {
-        <div class="sidebar__section-title">{{ section.title }}</div>
-      }
+      <div class="sidebar__section-title">{{ section.title }}</div>
       @for (item of section.items; track item.route) {
         <a
           class="sidebar__item"
@@ -23,9 +20,7 @@
           [title]="item.label"
         >
           <span class="sidebar__item-icon">{{ item.icon }}</span>
-          @if (!collapsed()) {
-            <span class="sidebar__item-label">{{ item.label }}</span>
-          }
+          <span class="sidebar__item-label">{{ item.label }}</span>
         </a>
       }
     }
