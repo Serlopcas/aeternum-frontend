@@ -27,6 +27,21 @@
   </nav>
 
   <button
+    class="sidebar__about"
+    type="button"
+    (click)="openAbout.emit()"
+    [attr.aria-label]="collapsed() ? 'Acerca de Aeternum Track' : null"
+    [title]="collapsed() ? 'Acerca de Aeternum Track' : ''"
+  >
+    <span class="sidebar__about-icon">ℹ️</span>
+    <span class="sidebar__about-label">
+      <span class="sidebar__about-version">v1.0</span>
+      <span class="sidebar__about-sep" aria-hidden="true">·</span>
+      <span>Acerca de</span>
+    </span>
+  </button>
+
+  <button
     class="sidebar__toggle sidebar__toggle--desktop"
     (click)="collapsed.set(!collapsed())"
     [attr.aria-label]="collapsed() ? 'Expandir menú lateral' : 'Contraer menú lateral'"

@@ -1,5 +1,9 @@
 <div class="shell">
-  <app-sidebar [(collapsed)]="sidebarCollapsed" [(mobileOpen)]="mobileSidebarOpen" />
+  <app-sidebar
+    [(collapsed)]="sidebarCollapsed"
+    [(mobileOpen)]="mobileSidebarOpen"
+    (openAbout)="aboutOpen.set(true)"
+  />
 
   <div
     class="shell__overlay"
@@ -9,7 +13,7 @@
   ></div>
 
   <div class="shell__main" [class.shell__main--collapsed]="sidebarCollapsed()">
-    <app-topbar>
+    <app-topbar (openAbout)="aboutOpen.set(true)">
       <button
         class="topbar__hamburger"
         type="button"
@@ -22,6 +26,8 @@
     <main class="shell__content">
       <router-outlet />
     </main>
+    <app-footer (openAbout)="aboutOpen.set(true)" />
   </div>
 </div>
 <app-toast-outlet />
+<app-about-dialog [open]="aboutOpen()" (close)="aboutOpen.set(false)" />

@@ -1,0 +1,77 @@
+@if (open()) {
+  <div class="dialog-backdrop" (click)="close.emit()">
+    <div
+      class="dialog about-dialog"
+      role="dialog"
+      aria-labelledby="about-dialog-title"
+      aria-modal="true"
+      (click)="$event.stopPropagation()"
+    >
+      <button class="about-dialog__close" type="button" (click)="close.emit()" aria-label="Cerrar">
+        ✕
+      </button>
+
+      <h3 class="about-dialog__title" id="about-dialog-title">Acerca de Aeternum Track</h3>
+
+      <p class="about-dialog__description">
+        Aeternum Track es una aplicación web de gestión interna para un mayorista de joyería B2B.
+        Permite centralizar catálogo, variantes, proveedores, clientes, inventario, compras, ventas,
+        alertas de stock e informes de margen.
+      </p>
+
+      <p class="about-dialog__description">
+        Proyecto final desarrollado por <strong>Sergio López Casado</strong>
+        para el ciclo de Desarrollo de Aplicaciones Web.
+      </p>
+
+      <div class="about-dialog__stack">
+        <span class="about-dialog__stack-badge">Angular</span>
+        <span class="about-dialog__stack-badge">Spring Boot</span>
+        <span class="about-dialog__stack-badge">PostgreSQL</span>
+        <span class="about-dialog__stack-badge">Bunny CDN</span>
+        <span class="about-dialog__stack-badge">Render</span>
+        <span class="about-dialog__stack-badge">Neon</span>
+      </div>
+
+      <div class="about-dialog__links">
+        <a
+          class="about-dialog__link"
+          href="https://www.linkedin.com/in/sergiolopezcasado/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          🔗 LinkedIn
+        </a>
+        <a
+          class="about-dialog__link"
+          href="https://github.com/Serlopcas"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          💻 GitHub
+        </a>
+        <a class="about-dialog__link" href="mailto:serlopcas.5@gmail.com"> ✉️ Contacto </a>
+        <a
+          class="about-dialog__link"
+          href="https://github.com/Serlopcas/aeternum-frontend"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          📦 Repo Frontend
+        </a>
+        <a
+          class="about-dialog__link"
+          href="https://github.com/Serlopcas/aeternum-backend"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ⚙️ Repo Backend
+        </a>
+      </div>
+
+      <div class="dialog__actions">
+        <button class="btn btn--secondary" type="button" (click)="close.emit()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
