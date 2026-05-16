@@ -4,6 +4,7 @@ import {
   ElementRef,
   HostListener,
   inject,
+  output,
   signal,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -21,6 +22,7 @@ export class TopbarComponent {
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
   menuOpen = signal(false);
+  openAbout = output<void>();
 
   @HostListener('document:click', ['$event.target'])
   onDocumentClick(target: EventTarget | null): void {

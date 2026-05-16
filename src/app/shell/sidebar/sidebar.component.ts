@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, model, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
@@ -28,6 +28,7 @@ export class SidebarComponent {
   private readonly router = inject(Router);
   collapsed = model(false);
   mobileOpen = model(false);
+  openAbout = output<void>();
   private readonly currentUrl = signal(this.router.url);
 
   constructor() {

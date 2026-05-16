@@ -3,9 +3,14 @@
 .login-page {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
+  background: var(--color-bg-page);
+}
+.login-page__main {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-page);
   padding: var(--space-6);
 }
 .login-card {
@@ -87,7 +92,7 @@
 
 // ── Mobile ──
 @include bp.mobile-only {
-  .login-page {
+  .login-page__main {
     padding: var(--space-4);
     align-items: flex-start;
     padding-top: var(--space-12);

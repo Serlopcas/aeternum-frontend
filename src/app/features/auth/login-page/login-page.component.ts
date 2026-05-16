@@ -4,13 +4,15 @@ import { Router } from '@angular/router';
 import { ApiError } from '../../../core/models/api.models';
 import { AuthApiService } from '../../../core/services/auth-api.service';
 import { AuthStateService } from '../../../core/state/auth-state.service';
+import { AboutDialogComponent } from '../../../shared/components/about-dialog/about-dialog.component';
 import { ApiErrorAlertComponent } from '../../../shared/components/api-error-alert/api-error-alert.component';
 import { ToastOutletComponent } from '../../../shared/components/toast-outlet/toast-outlet.component';
+import { FooterComponent } from '../../../shell/footer/footer.component';
 
 @Component({
   selector: 'app-login-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ApiErrorAlertComponent, ToastOutletComponent],
+  imports: [FormsModule, ApiErrorAlertComponent, ToastOutletComponent, FooterComponent, AboutDialogComponent],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })
@@ -23,6 +25,7 @@ export class LoginPageComponent {
   password = '';
   loading = signal(false);
   error = signal<ApiError | null>(null);
+  aboutOpen = signal(false);
 
   onSubmit(): void {
     // Clear all cached data before starting the login process

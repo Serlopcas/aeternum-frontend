@@ -133,6 +133,53 @@
 .sidebar__toggle:hover {
   background: var(--color-overlay-white-08);
 }
+.sidebar__about {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2-5) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--color-text-sidebar-muted);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  width: var(--size-full);
+  text-align: left;
+  border-top: var(--border-width-1) solid var(--color-overlay-white-06);
+  transition: all var(--motion-duration-base);
+  white-space: nowrap;
+}
+.sidebar__about:hover {
+  background: var(--color-overlay-white-06);
+  color: var(--color-text-sidebar-hover);
+}
+.sidebar__about-icon {
+  font-size: var(--font-size-xl-sm);
+  flex-shrink: 0;
+  width: var(--space-6);
+  text-align: center;
+}
+.sidebar__about-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  overflow: hidden;
+}
+.sidebar__about-version {
+  font-weight: var(--font-weight-medium);
+}
+.sidebar__about-sep {
+  opacity: 0.5;
+  user-select: none;
+}
+.sidebar--collapsed .sidebar__about {
+  justify-content: center;
+  padding: var(--space-2-5) var(--space-2);
+}
+.sidebar--collapsed .sidebar__about-label {
+  display: none;
+}
 
 // ── Tablet AND mobile: off-canvas drawer ──
 @include bp.tablet-down {
