@@ -61,7 +61,7 @@
             <td>
               <app-status-badge
                 [label]="tag.active ? 'Activo' : 'Inactivo'"
-                [colorClass]="getActiveColor(tag.active)"
+                [active]="tag.active"
               />
             </td>
             @if (auth.isGestor()) {

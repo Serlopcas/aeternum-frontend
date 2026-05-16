@@ -58,7 +58,7 @@
             <td>
               <app-status-badge
                 [label]="user.active ? 'Activo' : 'Inactivo'"
-                [colorClass]="getActiveColor(user.active)"
+                [active]="user.active"
               />
             </td>
             <td>

@@ -105,9 +105,6 @@ export class SuppliersListPageComponent implements OnInit {
     this.page.set(p);
     this.load();
   }
-  getActiveColor(active: boolean): string {
-    return active ? 'green' : 'red';
-  }
   askToggle(s: SupplierResponse): void {
     this.confirmItem.set(s);
   }

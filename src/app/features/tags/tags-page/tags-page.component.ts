@@ -12,10 +12,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-tags-page',
@@ -144,10 +141,6 @@ export class TagsPageComponent implements OnInit {
   onPageChange(p: number): void {
     this.page.set(p);
     this.loadTags();
-  }
-
-  getActiveColor(active: boolean): string {
-    return getActiveStatusColor(active);
   }
 
   // ─── Dialog ───

@@ -79,16 +79,20 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
 }
-.type-PURCHASE_RECEIVE {
-  background: var(--color-success-150);
-  color: var(--color-toast-success-text);
+.movement-type[data-movement='PURCHASE_IN'] {
+  background: var(--color-success-100);
+  color: var(--color-success-800);
 }
-.type-SALE_DELIVER {
-  background: var(--color-danger-150);
-  color: var(--color-toast-error-text);
+.movement-type[data-movement='SALE_OUT'] {
+  background: var(--color-danger-100);
+  color: var(--color-danger-800);
 }
-.type-ADJUSTMENT {
-  background: var(--color-warning-200);
+.movement-type[data-movement='ADJUSTMENT_IN'] {
+  background: var(--color-info-100);
+  color: var(--color-info-600);
+}
+.movement-type[data-movement='ADJUSTMENT_OUT'] {
+  background: var(--color-warning-100);
   color: var(--color-warning-700);
 }
 .tab-header {
@@ -208,6 +212,13 @@
 .btn--primary:hover {
   background: var(--color-brand-600);
 }
+.btn--danger {
+  background: var(--color-danger-600);
+  color: var(--color-bg-surface);
+}
+.btn--danger:hover {
+  background: var(--color-danger-700);
+}
 .btn--secondary {
   background: var(--color-bg-subtle);
   color: var(--color-text-secondary);
@@ -268,6 +279,15 @@
 .image-order {
   font-size: var(--space-3);
   color: var(--color-text-muted);
+}
+
+// ── Tab panels ──
+
+.tab-panel {
+  display: none;
+}
+.tab-panel--active {
+  display: block;
 }
 
 // ── Responsive ──

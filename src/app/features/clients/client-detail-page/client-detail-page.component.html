@@ -22,7 +22,7 @@
     }
   </div>
 
-  @if (tab() === 'info') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'info'">
     <div class="card">
       @if (editMode()) {
         <form
@@ -86,7 +86,7 @@
             <span class="info-label">Estado</span>
             <app-status-badge
               [label]="client()!.active ? 'Activo' : 'Inactivo'"
-              [colorClass]="getActiveColor(client()!.active)"
+              [active]="client()!.active"
             />
           </div>
         </div>
@@ -103,9 +103,9 @@
         }
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'contacts') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'contacts'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -152,9 +152,9 @@
         </table>
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'addresses') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'addresses'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -201,11 +201,11 @@
         </table>
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'sales') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'sales'">
     <app-sales-list-page [clientId]="client()!.id" />
-  }
+  </div>
 
   @if (contactDialogOpen()) {
     <div class="dialog-backdrop" (click)="contactDialogOpen.set(false)">

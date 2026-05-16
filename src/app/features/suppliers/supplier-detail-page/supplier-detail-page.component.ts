@@ -23,10 +23,7 @@ import { SupplierApiService } from '../../../core/services/supplier-api.service'
 import { AuthStateService } from '../../../core/state/auth-state.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { PurchasesListPageComponent } from '../../purchases/purchases-list-page/purchases-list-page.component';
 
 @Component({
@@ -179,10 +176,6 @@ export class SupplierDetailPageComponent implements OnInit {
       },
       error: () => this.catalogLoading.set(false),
     });
-  }
-
-  getActiveColor(active: boolean): string {
-    return getActiveStatusColor(active);
   }
 
   startEdit(): void {

@@ -11,10 +11,7 @@ import { EmptyStateComponent } from '../../../shared/components/empty-state/empt
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-users-list-page',
@@ -97,10 +94,6 @@ export class UsersListPageComponent implements OnInit {
   onPageChange(p: number): void {
     this.page.set(p);
     this.loadUsers();
-  }
-
-  getActiveColor(active: boolean): string {
-    return getActiveStatusColor(active);
   }
 
   toggleUserStatus(user: UserResponse): void {

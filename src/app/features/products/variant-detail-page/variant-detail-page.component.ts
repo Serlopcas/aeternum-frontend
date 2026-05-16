@@ -22,10 +22,7 @@ import { AuthStateService } from '../../../core/state/auth-state.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { CurrencyPipe, DateTimeFormatPipe } from '../../../shared/pipes/format.pipes';
 
 @Component({
@@ -111,10 +108,6 @@ export class VariantDetailPageComponent implements OnInit {
     });
   }
 
-  getColor(active: boolean): string {
-    return getActiveStatusColor(active);
-  }
-
   startEdit(): void {
     const v = this.variant()!;
     this.form = {
@@ -180,6 +173,16 @@ export class VariantDetailPageComponent implements OnInit {
       next: (h) => this.priceHistory.set(h),
       error: () => this.notify.error('Error cargando historial de precios'),
     });
+  }
+
+  getMovLabel(type: string): string {
+    const labels: Record<string, string> = {
+      PURCHASE_IN: 'Entrada compra',
+      SALE_OUT: 'Salida venta',
+      ADJUSTMENT_IN: 'Ajuste +',
+      ADJUSTMENT_OUT: 'Ajuste −',
+    };
+    return labels[type] ?? type;
   }
 
   loadMovements(): void {

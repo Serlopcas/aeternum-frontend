@@ -50,7 +50,7 @@
     </button>
   </div>
 
-  @if (tab() === 'info') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'info'">
     <div class="card">
       @if (editMode()) {
         <form
@@ -195,7 +195,7 @@
             <span class="info-label">Estado</span>
             <app-status-badge
               [label]="variant()!.active ? 'Activo' : 'Inactivo'"
-              [colorClass]="getColor(variant()!.active)"
+              [active]="variant()!.active"
             />
           </div>
         </div>
@@ -216,9 +216,9 @@
         }
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'images') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'images'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -268,7 +268,7 @@
         </div>
       }
     </div>
-  }
+  </div>
 
   <app-confirm-dialog
     [open]="confirmDeleteImage() !== null"
@@ -280,7 +280,7 @@
     (cancel)="confirmDeleteImage.set(null)"
   />
 
-  @if (tab() === 'suppliers') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'suppliers'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -322,7 +322,7 @@
                   <td>
                     <app-status-badge
                       [label]="sl.active ? 'Activo' : 'Inactivo'"
-                      [colorClass]="getColor(sl.active)"
+                      [active]="sl.active"
                     />
                   </td>
                   @if (auth.isGestor()) {
@@ -352,9 +352,9 @@
         </div>
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'priceHistory') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'priceHistory'">
     <div class="card">
       @if (!priceHistory().length) {
         <p class="empty-msg">Sin historial de precios.</p>
@@ -383,9 +383,9 @@
         </div>
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'movements') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'movements'">
     <div class="card">
       @if (!movements().length) {
         <p class="empty-msg">Sin movimientos de stock.</p>
@@ -407,8 +407,8 @@
                 <tr>
                   <td>{{ m.movementDate | appDateTime }}</td>
                   <td>
-                    <span class="movement-type" [class]="'type-' + m.movementType">{{
-                      m.movementType
+                    <span class="movement-type" [attr.data-movement]="m.movementType">{{
+                      getMovLabel(m.movementType)
                     }}</span>
                   </td>
                   <td [class.positive]="m.quantity > 0" [class.negative]="m.quantity < 0">
@@ -432,7 +432,7 @@
         </div>
       }
     </div>
-  }
+  </div>
 
   @if (supplierLinkDialogOpen()) {
     <div class="dialog-backdrop" (click)="supplierLinkDialogOpen.set(false)">
@@ -570,16 +570,15 @@
     </div>
   }
 
-  @if (confirmToggle()) {
-    <app-confirm-dialog
-      [title]="variant()!.active ? 'Desactivar variante' : 'Activar variante'"
-      [message]="variant()!.active ? '¿Desactivar esta variante?' : '¿Activar esta variante?'"
-      [confirmLabel]="variant()!.active ? 'Desactivar' : 'Activar'"
-      [destructive]="variant()!.active"
-      (confirmed)="toggleActive()"
-      (cancelled)="confirmToggle.set(false)"
-    />
-  }
+  <app-confirm-dialog
+    [open]="confirmToggle()"
+    [title]="variant()!.active ? 'Desactivar variante' : 'Activar variante'"
+    [message]="variant()!.active ? '¿Desactivar esta variante?' : '¿Activar esta variante?'"
+    [confirmLabel]="variant()!.active ? 'Desactivar' : 'Activar'"
+    [destructive]="variant()!.active"
+    (confirm)="toggleActive()"
+    (cancel)="confirmToggle.set(false)"
+  />
 
   @if (imageDialogOpen()) {
     <div class="dialog-backdrop" (click)="imageDialogOpen.set(false)">

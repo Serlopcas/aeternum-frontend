@@ -71,6 +71,20 @@
   min-width: var(--size-200);
   padding: var(--space-1-5);
   z-index: var(--z-dropdown);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(calc(-1 * var(--space-2)));
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease-standard),
+    visibility var(--motion-duration-fast),
+    transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.topbar__menu--open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 .topbar__menu-item {
   display: flex;

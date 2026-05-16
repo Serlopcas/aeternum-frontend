@@ -29,7 +29,7 @@
   </button>
 </div>
 
-@if (tab() === 'movements') {
+<div class="tab-panel" [class.tab-panel--active]="tab() === 'movements'">
   <div class="filters-grid">
     <div class="filters-row">
       <app-search-input
@@ -126,7 +126,7 @@
                 <td class="font-mono">{{ m.variantSku }}</td>
                 <td>{{ m.productName }}</td>
                 <td>
-                  <span class="type-badge" [class]="getMovClass(m.movementType)">{{
+                  <span class="type-badge" [attr.data-type]="m.movementType">{{
                     getMovLabel(m.movementType)
                   }}</span>
                 </td>
@@ -158,9 +158,9 @@
       (pageChange)="movPageNum = $event; loadMovements()"
     />
   }
-}
+</div>
 
-@if (tab() === 'stock') {
+<div class="tab-panel" [class.tab-panel--active]="tab() === 'stock'">
   <div class="filters-bar">
     <app-search-input
       placeholder="Buscar por SKU, producto, material..."
@@ -243,7 +243,7 @@
       (pageChange)="onStockPageChange($event)"
     />
   }
-}
+</div>
 
 @if (showAdjustDialog) {
   <div class="dialog-backdrop" (click)="showAdjustDialog = false">

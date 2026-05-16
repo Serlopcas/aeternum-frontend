@@ -1,9 +1,12 @@
 <div class="shell">
   <app-sidebar [(collapsed)]="sidebarCollapsed" [(mobileOpen)]="mobileSidebarOpen" />
 
-  @if (mobileSidebarOpen()) {
-    <div class="shell__overlay" aria-hidden="true" (click)="closeMobileSidebar()"></div>
-  }
+  <div
+    class="shell__overlay"
+    [class.shell__overlay--open]="mobileSidebarOpen()"
+    aria-hidden="true"
+    (click)="closeMobileSidebar()"
+  ></div>
 
   <div class="shell__main" [class.shell__main--collapsed]="sidebarCollapsed()">
     <app-topbar>

@@ -25,7 +25,7 @@
     }
   </div>
 
-  @if (tab() === 'info') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'info'">
     <div class="card">
       @if (editMode()) {
         <form
@@ -103,7 +103,7 @@
             <span class="info-label">Estado</span>
             <app-status-badge
               [label]="supplier()!.active ? 'Activo' : 'Inactivo'"
-              [colorClass]="getActiveColor(supplier()!.active)"
+              [active]="supplier()!.active"
             />
           </div>
         </div>
@@ -120,9 +120,9 @@
         }
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'contacts') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'contacts'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -169,9 +169,9 @@
         </table>
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'addresses') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'addresses'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -218,9 +218,9 @@
         </table>
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'catalog') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'catalog'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="card__header">
@@ -294,11 +294,11 @@
         }
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'purchases') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'purchases'">
     <app-purchases-list-page [supplierId]="supplier()!.id" />
-  }
+  </div>
 
   @if (linkDialogOpen()) {
     <div class="dialog-backdrop" (click)="linkDialogOpen.set(false)">

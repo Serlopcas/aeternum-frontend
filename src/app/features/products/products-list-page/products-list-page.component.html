@@ -95,7 +95,7 @@
             <div class="product-card__footer">
               <app-status-badge
                 [label]="p.active ? 'Activo' : 'Inactivo'"
-                [colorClass]="getActiveColor(p.active)"
+                [active]="p.active"
               />
               @if (auth.isGestor()) {
                 <button
@@ -126,7 +126,7 @@
           <div class="product-card__footer">
             <app-status-badge
               [label]="p.active ? 'Activo' : 'Inactivo'"
-              [colorClass]="getActiveColor(p.active)"
+              [active]="p.active"
             />
             @if (auth.isGestor()) {
               <button
@@ -176,7 +176,7 @@
                 <td>
                   <app-status-badge
                     [label]="p.active ? 'Activo' : 'Inactivo'"
-                    [colorClass]="getActiveColor(p.active)"
+                    [active]="p.active"
                   />
                 </td>
                 <td>
@@ -211,7 +211,7 @@
               <td>
                 <app-status-badge
                   [label]="p.active ? 'Activo' : 'Inactivo'"
-                  [colorClass]="getActiveColor(p.active)"
+                  [active]="p.active"
                 />
               </td>
               <td>

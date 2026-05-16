@@ -68,17 +68,14 @@
   </div>
 
   <ng-template #treeNode let-node="node" let-depth="depth">
-    <div class="tree-item" [style.paddingLeft.px]="16 + depth * 24">
+    <div class="tree-item" [style.--depth]="depth">
       <span class="tree-icon">{{ depth === 0 || node.children?.length > 0 ? '📁' : '📄' }}</span>
       <span class="tree-name" [class.inactive]="!node.active"
         >{{ node.name }}
         <span class="cat-code">{{ node.categoryCode }}</span>
       </span>
       <span class="tree-status">
-        <app-status-badge
-          [label]="node.active ? 'Activo' : 'Inactivo'"
-          [colorClass]="getActiveColor(node.active)"
-        />
+        <app-status-badge [label]="node.active ? 'Activo' : 'Inactivo'" [active]="node.active" />
       </span>
       @if (auth.isGestor()) {
         <div class="tree-actions">
@@ -157,7 +154,7 @@
               <td>
                 <app-status-badge
                   [label]="cat.active ? 'Activo' : 'Inactivo'"
-                  [colorClass]="getActiveColor(cat.active)"
+                  [active]="cat.active"
                 />
               </td>
               @if (auth.isGestor()) {

@@ -40,7 +40,7 @@
     </button>
   </div>
 
-  @if (tab() === 'info') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'info'">
     <div class="card">
       @if (editMode()) {
         <form
@@ -226,7 +226,7 @@
             <span class="info-label">Estado</span>
             <app-status-badge
               [label]="product()!.active ? 'Activo' : 'Inactivo'"
-              [colorClass]="getColor(product()!.active)"
+              [active]="product()!.active"
             />
           </div>
         </div>
@@ -249,9 +249,9 @@
         }
       }
     </div>
-  }
+  </div>
 
-  @if (tab() === 'images') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'images'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -301,7 +301,7 @@
         </div>
       }
     </div>
-  }
+  </div>
 
   <app-confirm-dialog
     [open]="confirmDeleteImage() !== null"
@@ -313,7 +313,7 @@
     (cancel)="confirmDeleteImage.set(null)"
   />
 
-  @if (tab() === 'variants') {
+  <div class="tab-panel" [class.tab-panel--active]="tab() === 'variants'">
     <div class="card">
       @if (auth.isGestor()) {
         <div class="tab-header">
@@ -359,7 +359,7 @@
                   <td>
                     <app-status-badge
                       [label]="v.active ? 'Activo' : 'Inactivo'"
-                      [colorClass]="getColor(v.active)"
+                      [active]="v.active"
                     />
                   </td>
                   <td>
@@ -390,7 +390,7 @@
         </div>
       }
     </div>
-  }
+  </div>
 
   @if (variantDialogOpen()) {
     <div class="dialog-backdrop" (click)="variantDialogOpen.set(false)">
