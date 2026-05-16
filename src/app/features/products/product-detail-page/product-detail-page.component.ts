@@ -29,10 +29,7 @@ import { AuthStateService } from '../../../core/state/auth-state.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { CurrencyPipe } from '../../../shared/pipes/format.pipes';
 
 interface FlatCategory {
@@ -177,10 +174,6 @@ export class ProductDetailPageComponent implements OnInit {
         this.router.navigate(['/products']);
       },
     });
-  }
-
-  getColor(active: boolean): string {
-    return getActiveStatusColor(active);
   }
 
   variantName(v: ProductVariantResponse): string {

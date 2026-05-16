@@ -105,9 +105,6 @@ export class ClientsListPageComponent implements OnInit {
     this.page.set(p);
     this.load();
   }
-  getActiveColor(active: boolean): string {
-    return active ? 'green' : 'red';
-  }
   askToggle(c: ClientResponse): void {
     this.confirmItem.set(c);
   }

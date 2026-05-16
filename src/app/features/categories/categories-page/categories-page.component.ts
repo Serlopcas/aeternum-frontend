@@ -19,10 +19,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-categories-page',
@@ -172,10 +169,6 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
   onPageChange(p: number): void {
     this.page.set(p);
     this.loadCategories();
-  }
-
-  getActiveColor(active: boolean): string {
-    return getActiveStatusColor(active);
   }
 
   /**

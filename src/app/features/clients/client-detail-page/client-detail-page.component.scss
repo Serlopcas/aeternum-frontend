@@ -180,6 +180,14 @@
   --dialog-max-w: var(--dialog-width-lg);
 }
 
+// ── Tab panels ──
+.tab-panel {
+  display: none;
+}
+.tab-panel--active {
+  display: block;
+}
+
 // ── Responsive ──
 @include bp.tablet-down {
   .detail-grid {

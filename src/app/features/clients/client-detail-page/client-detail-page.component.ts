@@ -11,10 +11,7 @@ import { NotificationService } from '../../../core/services/notification.service
 import { AuthStateService } from '../../../core/state/auth-state.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { SalesListPageComponent } from '../../sales/sales-list-page/sales-list-page.component';
 
 @Component({
@@ -86,10 +83,6 @@ export class ClientDetailPageComponent implements OnInit {
         this.router.navigate(['/clients']);
       },
     });
-  }
-
-  getActiveColor(active: boolean): string {
-    return getActiveStatusColor(active);
   }
 
   startEdit(): void {

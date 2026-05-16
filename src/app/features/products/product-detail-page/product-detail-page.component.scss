@@ -396,6 +396,14 @@
   margin-left: var(--space-1);
 }
 
+// ── Tab panels ──
+.tab-panel {
+  display: none;
+}
+.tab-panel--active {
+  display: block;
+}
+
 // ── Responsive ──
 
 .table-scroll {

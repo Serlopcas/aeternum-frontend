@@ -23,7 +23,7 @@
             <td class="col--status">
               <app-status-badge
                 [label]="row.active ? 'Activo' : 'Inactivo'"
-                [colorClass]="getActiveColor(row.active)"
+                [active]="row.active"
               />
             </td>
           }

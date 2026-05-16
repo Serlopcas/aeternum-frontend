@@ -41,9 +41,6 @@ export class ColorsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
-    // keep dialog positioning variables updated on resize
-    this._onResize = this._onResize.bind(this);
-    window.addEventListener('resize', this._onResize);
   }
 
   load(): void {
@@ -63,7 +60,6 @@ export class ColorsPageComponent implements OnInit {
     this.editing.set(false);
     this.editId.set(null);
     this.formData = { colorName: '', colorCode: '#000000' };
-    this.updateDialogVars();
     this.dialogOpen.set(true);
   }
 
@@ -71,7 +67,6 @@ export class ColorsPageComponent implements OnInit {
     this.editing.set(true);
     this.editId.set(color.id);
     this.formData = { colorName: color.colorName, colorCode: color.colorCode };
-    this.updateDialogVars();
     this.dialogOpen.set(true);
   }
 
@@ -129,24 +124,5 @@ export class ColorsPageComponent implements OnInit {
         this.confirmColor.set(null);
       },
     });
-  }
-
-  // ─── Dialog positioning helpers ───
-  private _onResize(): void {
-    if (this.dialogOpen()) {
-      this.updateDialogVars();
-    }
-  }
-
-  private updateDialogVars(): void {
-    const shellMain = document.querySelector('.shell__main') as HTMLElement | null;
-    if (!shellMain) return;
-    const r = shellMain.getBoundingClientRect();
-    document.documentElement.style.setProperty('--content-left', `${r.left}px`);
-    document.documentElement.style.setProperty('--content-width', `${r.width}px`);
-  }
-
-  ngOnDestroy(): void {
-    window.removeEventListener('resize', this._onResize);
   }
 }

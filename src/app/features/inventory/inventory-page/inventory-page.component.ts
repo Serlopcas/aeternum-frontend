@@ -253,16 +253,6 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     return map[type] ?? type;
   }
 
-  getMovClass(type: string): string {
-    const map: Record<string, string> = {
-      PURCHASE_IN: 'type-in',
-      SALE_OUT: 'type-out',
-      ADJUSTMENT_IN: 'type-adj-in',
-      ADJUSTMENT_OUT: 'type-adj-out',
-    };
-    return map[type] ?? '';
-  }
-
   searchAdjVariant(): void {
     if (this.adjQuery.length < 2) {
       this.adjVariants.set([]);

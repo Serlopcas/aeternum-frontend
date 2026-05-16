@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 @Component({
   selector: 'app-status-badge',
@@ -9,6 +9,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 export class StatusBadgeComponent {
   label = input('');
   colorClass = input('gray');
+  active = input<boolean | null>(null);
+
+  protected readonly resolvedColorClass = computed(() => {
+    const a = this.active();
+    return a !== null ? (a ? 'active' : 'inactive') : this.colorClass();
+  });
 }
 
 export function getDocumentStatusColor(code: string): string {

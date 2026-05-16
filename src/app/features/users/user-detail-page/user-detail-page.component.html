@@ -23,7 +23,7 @@
           <span class="info-label">Estado</span>
           <app-status-badge
             [label]="user()!.active ? 'Activo' : 'Inactivo'"
-            [colorClass]="getActiveColor(user()!.active)"
+            [active]="user()!.active"
           />
         </div>
       </div>

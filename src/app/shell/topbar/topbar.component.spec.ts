@@ -134,18 +134,22 @@ describe('TopbarComponent — template', () => {
     expect(img.src).toContain('avatar.jpg');
   });
 
-  it('does not render the dropdown menu when menuOpen is false', () => {
+  it('does not show the dropdown menu when menuOpen is false', () => {
     const { fixture } = setup(MOCK_USER);
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('.topbar__menu')).toBeNull();
+    const menu = el.querySelector('.topbar__menu');
+    expect(menu).not.toBeNull();
+    expect(menu!.classList.contains('topbar__menu--open')).toBe(false);
   });
 
-  it('renders the dropdown menu when menuOpen is true', () => {
+  it('shows the dropdown menu when menuOpen is true', () => {
     const { fixture, component } = setup(MOCK_USER);
     component.menuOpen.set(true);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('.topbar__menu')).not.toBeNull();
+    const menu = el.querySelector('.topbar__menu');
+    expect(menu).not.toBeNull();
+    expect(menu!.classList.contains('topbar__menu--open')).toBe(true);
   });
 
   it('toggles menuOpen when the profile div is clicked', () => {

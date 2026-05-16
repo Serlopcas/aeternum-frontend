@@ -33,10 +33,6 @@ export class EntityTableComponent<T extends { id: number; active: boolean }> {
 
   actionClick = output<{ action: EntityTableAction<T>; row: T }>();
 
-  getActiveColor(active: boolean): string {
-    return active ? 'green' : 'red';
-  }
-
   getLabel(action: EntityTableAction<T>, row: T): string {
     return typeof action.label === 'function' ? action.label(row) : action.label;
   }

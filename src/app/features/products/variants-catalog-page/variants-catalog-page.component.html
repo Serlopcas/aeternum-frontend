@@ -100,7 +100,7 @@
                 </span>
                 <app-status-badge
                   [label]="v.active ? 'Activo' : 'Inactivo'"
-                  [colorClass]="getActiveColor(v.active)"
+                  [active]="v.active"
                 />
               </div>
             </div>
@@ -147,7 +147,7 @@
               </span>
               <app-status-badge
                 [label]="v.active ? 'Activo' : 'Inactivo'"
-                [colorClass]="getActiveColor(v.active)"
+                [active]="v.active"
               />
             </div>
           </div>

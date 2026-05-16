@@ -233,6 +233,14 @@
   color: var(--color-text-muted);
 }
 
+// ── Tab panels ──
+.tab-panel {
+  display: none;
+}
+.tab-panel--active {
+  display: block;
+}
+
 // ── Responsive ──
 @include bp.tablet-down {
   .detail-grid {

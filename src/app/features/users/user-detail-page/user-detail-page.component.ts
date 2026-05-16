@@ -8,10 +8,7 @@ import { AuthStateService } from '../../../core/state/auth-state.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import {
-  StatusBadgeComponent,
-  getActiveStatusColor,
-} from '../../../shared/components/status-badge/status-badge.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-user-detail-page',
@@ -63,10 +60,6 @@ export class UserDetailPageComponent implements OnInit {
       next: (r) => this.allRoles.set(r),
       error: () => this.notify.error('Error cargando roles'),
     });
-  }
-
-  getActiveColor(active: boolean): string {
-    return getActiveStatusColor(active);
   }
 
   toggleRole(code: string): void {
